@@ -9,6 +9,7 @@ import (
 	"github.com/NebulousLabs/Sia/types"
 )
 
+// Does an arbitrary request to the server referenced at srv, returns as a byte array.
 func (srv *ExploreServerData) apiGet (api_call string) (response []byte, err error) {
 	// Do a http request to the sia daemon
 	resp, err := http.Get(srv.SiaDaemonUrl+api_call)
@@ -28,6 +29,7 @@ func (srv *ExploreServerData) apiGet (api_call string) (response []byte, err err
 	return
 }
 
+// Wrapper around apiGet that parses into a block object
 func (srv *ExploreServerData) apiGetBlock() (b types.Block, err error) {
 	blockJson, err := srv.apiGet("/blockexplorer/currentblock")
 	if err != nil {

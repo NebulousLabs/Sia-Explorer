@@ -40,8 +40,9 @@ func (srv *ExploreServerData) homePage(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, block)
 }
 
-// Handles the root page being requested
-func (srv *ExploreServerData) RootHandler(w http.ResponseWriter, r *http.Request) {
+// Handles the root page being requested. Is responsible for
+// differentiating between api calls and pages
+func (srv *ExploreServerData) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	if (strings.Contains(r.URL.Path, ".")) {
 		srv.ServeMux.ServeHTTP(w, r)
@@ -51,15 +52,15 @@ func (srv *ExploreServerData) RootHandler(w http.ResponseWriter, r *http.Request
 }
 
 func main() {
-	// Initilize variables and such
+	// Initilize Server variable
 	var srv = ExploreServerData{
-		SiaDaemonUrl: "http://localhost:9000",
+		SiaDaemonUrl: "http://localhost:9980",
 		BlockTemplatePath: "templates/curblock.template",
 		ServeMux: http.NewServeMux(),
 	}
 
-	srv.ServeMux.Handle("/", http.FileServer(http.Dir("./")))
-	http.HandleFunc("/", srv.RootHandler)
+	srv.ServeMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
+	http.HandleFunc("/", srv.rootHandler)
 	http.ListenAndServe(":9983", nil)
 	fmt.Println("Done serving")
 }
