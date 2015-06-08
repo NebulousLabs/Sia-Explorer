@@ -3,10 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-
-	"github.com/NebulousLabs/Sia/types"
+	"strings"
 )
 
 // A structure to store any state of the server. Should remain
@@ -19,47 +17,49 @@ type ExploreServerData struct {
 	// BlockTemplatePath should hold the path to the html template
 	// file used to display the block
 	BlockTemplatePath string
+
+	// Used to store the server muxer
+	ServeMux *http.ServeMux
 }
 
-var srv = ExploreServerData{
-	SiaDaemonUrl: "http://localhost:9980",
-	BlockTemplatePath: "templates/curblock.template",
+// writeJSON writes the object to the ResponseWriter. If the encoding fails, an
+// error is written instead.
+func writeJSON(w http.ResponseWriter, obj interface{}) {
+	if json.NewEncoder(w).Encode(obj) != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
-// This function is called when the user requests the home page
-// currently. It stores always pulls the latest block from the
-// blockchain
-func blockGetter(w http.ResponseWriter, r *http.Request) {
-
-	// Do a http request to the sia daemon
-	resp, err := http.Get(srv.SiaDaemonUrl+"/consensus/curblock")
+func (srv *ExploreServerData) homePage(w http.ResponseWriter, r *http.Request) {
+	block, err := srv.apiGetBlock()
 	if err != nil {
-		http.Error(w, "Could not get block from remote server", 500)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-
-	// Attepmt to interpret as a block
-	var b types.Block
-
-	err = json.Unmarshal(body, &b)
-	if err != nil {
-		http.Error(w, "Error Parsing block:" + err.Error(), 500)
-		return
-	}
-
-	w.Write(body)
+	writeJSON(w, block)
 }
 
-func styleGetter(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./style.css")
+// Handles the root page being requested
+func (srv *ExploreServerData) RootHandler(w http.ResponseWriter, r *http.Request) {
+
+	if (strings.Contains(r.URL.Path, ".")) {
+		srv.ServeMux.ServeHTTP(w, r)
+	} else {
+		srv.homePage(w, r)
+	}
 }
 
 func main() {
-	http.HandleFunc("/", blockGetter)
-	http.HandleFunc("/style.css", styleGetter)
+	// Initilize variables and such
+	var srv = ExploreServerData{
+		SiaDaemonUrl: "http://localhost:9000",
+		BlockTemplatePath: "templates/curblock.template",
+		ServeMux: http.NewServeMux(),
+	}
+
+	srv.ServeMux.Handle("/", http.FileServer(http.Dir("./")))
+	http.HandleFunc("/", srv.RootHandler)
 	http.ListenAndServe(":9983", nil)
 	fmt.Println("Done serving")
 }
