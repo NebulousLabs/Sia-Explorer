@@ -5,21 +5,19 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/NebulousLabs/Sia-Block-Explorer/api"
 )
 
 // A structure to store any state of the server. Should remain
 // relatively unpopulated, mostly constants which will eventually be
 // broken off
-type ExploreServerData struct {
+type ExploreServer struct {
 	// The explorer must know where to send the API calls
-	SiaDaemonUrl string
-
-	// BlockTemplatePath should hold the path to the html template
-	// file used to display the block
-	BlockTemplatePath string
+	siad *api.ApiLink
 
 	// Used to store the server muxer
-	ServeMux *http.ServeMux
+	serveMux *http.ServeMux
 }
 
 // writeJSON writes the object to the ResponseWriter. If the encoding fails, an
@@ -30,36 +28,66 @@ func writeJSON(w http.ResponseWriter, obj interface{}) {
 	}
 }
 
-func (srv *ExploreServerData) homePage(w http.ResponseWriter, r *http.Request) {
-	block, err := srv.apiGetBlock()
+func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
+	chainheight, err := srv.siad.BlockChain()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
+	block, err := srv.siad.GetCurrent()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	siacoins, err := srv.siad.Siacoins()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	filecontracts, err := srv.siad.FileContracts()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	blocklist, err := srv.siad.GetBlockData(0, chainheight)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+
+	writeJSON(w, chainheight)
 	writeJSON(w, block)
+	writeJSON(w, siacoins)
+	writeJSON(w, filecontracts)
+	writeJSON(w, blocklist)
 }
 
 // Handles the root page being requested. Is responsible for
 // differentiating between api calls and pages
-func (srv *ExploreServerData) rootHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	if (strings.Contains(r.URL.Path, ".")) {
-		srv.ServeMux.ServeHTTP(w, r)
+		srv.serveMux.ServeHTTP(w, r)
 	} else {
-		srv.homePage(w, r)
+		srv.overviewPage(w, r)
 	}
 }
 
+// TODO: parse port as a command line option
+
 func main() {
-	// Initilize Server variable
-	var srv = ExploreServerData{
-		SiaDaemonUrl: "http://localhost:9980",
-		BlockTemplatePath: "templates/curblock.template",
-		ServeMux: http.NewServeMux(),
+	// Initilize the api state
+	var srv = &ExploreServer{
+		siad: api.New("9000"),
+		serveMux: http.NewServeMux(),
 	}
 
-	srv.ServeMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
+	srv.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
 	http.HandleFunc("/", srv.rootHandler)
 	http.ListenAndServe(":9983", nil)
 	fmt.Println("Done serving")
