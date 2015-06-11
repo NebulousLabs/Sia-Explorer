@@ -59,12 +59,31 @@ func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	page, err := parseOverview(overviewRoot{
+		Chainheight: chainheight,
+		Curblock: block,
+		Siacoins: siacoins,
+		FileContracts: filecontracts,
+		Blocks: blocklist,
+	})
 
-	writeJSON(w, chainheight)
-	writeJSON(w, block)
-	writeJSON(w, siacoins)
-	writeJSON(w, filecontracts)
-	writeJSON(w, blocklist)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	w.Write(page)
+
+	// writeJSON(w, chainheight)
+	// writeJSON(w, block)
+	// writeJSON(w, siacoins)
+	// writeJSON(w, filecontracts)
+	// fmt.Fprintf(w, "\n")
+	// hr := rateString(hashrate(blocklist[0:chainheight]))
+	// fmt.Fprintf(w, "Average Hash Rate (All time): %s\n", hr)
+	// hr = rateString(hashrate(blocklist[chainheight-400:chainheight-300]))
+	// fmt.Fprintf(w, "Average Hash Rate (last 20 blocks): %s\n", hr)
+	// writeJSON(w, blocklist)
 }
 
 // Handles the root page being requested. Is responsible for

@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <title>Sia Blockchain Explorer Alpha</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+	<td>Current Blockchain Height</td>
+	<td>{{.Chainheight}}</td>
+      </tr>
+      <tr>
+	<td>Current Block Id</td>
+	<td>{{printf "%x" .Curblock.Block.ID}}</td>
+      </tr>
+      <tr>
+	<td>Total Siacoin</td>
+	<td>{{siacoinString .Siacoins.TotalCurrency}}</td>
+      </tr>
+      <tr>
+	<td>Siacoin Sent</td>
+	<td>{{siacoinString .Siacoins.CurrencySent}}</td>
+      </tr>
+      <tr>
+	<td>File Contracts</td>
+	<td>{{.FileContracts.FileContractCount}}</td>
+      </tr>
+      <tr>
+	<td>Siacoin spent on file contracts</td>
+	<td>{{siacoinString .FileContracts.FileContractCosts}}</td>
+      </tr>
+      <tr>
+	<td>Hash rate (All time)</td>
+	<td>{{hashAvgString .Chainheight .}}</td>
+      </tr>
+      <tr>
+	<td>Hash rate (last 1000 blocks)</td>
+	<td>{{hashAvgString 1000 .}}</td>
+      </tr>
+      <tr>
+	<td>Hash rate (last 100 blocks)</td>
+	<td>{{hashAvgString 100 .}}</td>
+      </tr>
+      <tr>
+	<td>Hash rate (last 30 blocks)</td>
+	<td>{{hashAvgString 30 .}}</td>
+      </tr>
+      <tr>
+	<td>Hash rate (last 10 blocks)</td>
+	<td>{{hashAvgString 10 .}}</td>
+      </tr>
+
+    </table>
+  </body>
+</html>
