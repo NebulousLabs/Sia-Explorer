@@ -6,31 +6,31 @@
     <table>
       <tr>
 	<td>Current Blockchain Height</td>
-	<td>{{.Chainheight}}</td>
+	<td>{{.Explorer.Height}}</td>
       </tr>
       <tr>
 	<td>Current Block Id</td>
-	<td>{{printf "%x" .Curblock.Block.ID}}</td>
+	<td>{{printf "%x" .Explorer.Block.ID}}</td>
       </tr>
       <tr>
 	<td>Total Siacoin</td>
-	<td>{{siacoinString .Siacoins.TotalCurrency}}</td>
+	<td>{{siacoinString .Explorer.TotalCurrency}}</td>
       </tr>
       <tr>
 	<td>Siacoin Sent</td>
-	<td>{{siacoinString .Siacoins.CurrencySent}}</td>
+	<td>{{siacoinString .Explorer.CurrencySent}}</td>
       </tr>
       <tr>
 	<td>File Contracts</td>
-	<td>{{.FileContracts.FileContractCount}}</td>
+	<td>{{.Explorer.FileContractCount}}</td>
       </tr>
       <tr>
 	<td>Siacoin spent on file contracts</td>
-	<td>{{siacoinString .FileContracts.FileContractCosts}}</td>
+	<td>{{siacoinString .Explorer.FileContractCosts}}</td>
       </tr>
       <tr>
 	<td>Hash rate (All time)</td>
-	<td>{{hashAvgString .Chainheight .}}</td>
+	<td>{{hashAvgString .Explorer.Height .}}</td>
       </tr>
       <tr>
 	<td>Hash rate (last 1000 blocks)</td>

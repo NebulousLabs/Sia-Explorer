@@ -29,40 +29,23 @@ func writeJSON(w http.ResponseWriter, obj interface{}) {
 }
 
 func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
-	chainheight, err := srv.siad.BlockChain()
+	// First query the local instance of siad for the status
+	explorerState, err := srv.siad.ExplorerState()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	block, err := srv.siad.GetCurrent()
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	siacoins, err := srv.siad.Siacoins()
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	filecontracts, err := srv.siad.FileContracts()
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	blocklist, err := srv.siad.GetBlockData(0, chainheight)
+	blocklist, err := srv.siad.GetBlockData(0, explorerState.Height)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
+	// Attempt to make a page out of it
 	page, err := parseOverview(overviewRoot{
-		Chainheight: chainheight,
-		Curblock: block,
-		Siacoins: siacoins,
-		FileContracts: filecontracts,
+		Explorer: explorerState,
 		Blocks: blocklist,
 	})
-
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -85,7 +68,7 @@ func (srv *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
 // TODO: parse port as a command line option
 
 func main() {
-	// Initilize the api state
+	// Initilize the server
 	var srv = &ExploreServer{
 		siad: api.New("9000"),
 		serveMux: http.NewServeMux(),

@@ -70,54 +70,15 @@ func (link *ApiLink) Query (apiCall string, parameters []parameter) ([]byte, err
 	return link.Get(apiCall)
 }
 
-// Does the call to get the current blockchain
-func (link *ApiLink) BlockChain() (height types.BlockHeight, err error) {
-	heightJSON, err := link.Get("/blockexplorer/blockchain")
+
+// ExplorerState queries the locally running statu
+func (link *ApiLink) ExplorerState() (explorerStatus modules.ExplorerStatus, err error) {
+	stateJSON, err := link.Get("/blockexplorer/status")
 	if err != nil {
 		return
 	}
 
-	// Attepmt to interpret as a block
-	err = json.Unmarshal(heightJSON, &height)
-
-	// Returs the error if there is one too
-	return
-}
-
-// Wrapper around apiGet that parses into a block object
-func (link *ApiLink) GetCurrent() (b modules.ExplorerCurrentBlockData, err error) {
-	blockJson, err := link.Get("/blockexplorer/current")
-	if err != nil {
-		return
-	}
-
-	// Attepmt to interpret as a block
-	err = json.Unmarshal(blockJson, &b)
-
-	// Returs the error if there is one too
-	return
-}
-
-// Does the call to get information about the siacoins
-func (link *ApiLink) Siacoins() (siacoins modules.ExplorerSiacoinData, err error) {
-	siacoinJSON, err := link.Get("/blockexplorer/siacoins")
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(siacoinJSON, &siacoins)
-
-	return
-}
-
-// Queries the sia daemon api to get inforation about file contracts
-func (link *ApiLink) FileContracts() (filecontracts modules.ExplorerFileContractData, err error) {
-	filecontractsJSON, err := link.Get("/blockexplorer/filecontracts")
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(filecontractsJSON, &filecontracts)
+	err = json.Unmarshal(stateJSON, &explorerStatus)
 
 	return
 }

@@ -12,10 +12,7 @@ import (
 
 // This will be the root struct given to the template parser
 type overviewRoot struct {
-	Chainheight types.BlockHeight
-	Curblock modules.ExplorerCurrentBlockData
-	Siacoins modules.ExplorerSiacoinData
-	FileContracts modules.ExplorerFileContractData
+	Explorer modules.ExplorerStatus
 	Blocks []modules.ExplorerBlockData
 }
 
@@ -40,7 +37,10 @@ func siacoinString(siacoins types.Currency) string {
 }
 
 func hashAvgString(blocks types.BlockHeight, o overviewRoot) (s string) {
-	s = rateString(hashrate(o.Blocks[o.Chainheight - blocks:o.Chainheight]))
+	if int(blocks) >= len(o.Blocks) {
+		return rateString(hashrate(o.Blocks))
+	}
+	s = rateString(hashrate(o.Blocks[o.Explorer.Height - blocks:o.Explorer.Height]))
 	return
 }
 
