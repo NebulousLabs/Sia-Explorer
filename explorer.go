@@ -34,25 +34,21 @@ func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 	block, err := srv.siad.GetCurrent()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 	siacoins, err := srv.siad.Siacoins()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 	filecontracts, err := srv.siad.FileContracts()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 	blocklist, err := srv.siad.GetBlockData(0, chainheight)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -73,17 +69,6 @@ func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(page)
-
-	// writeJSON(w, chainheight)
-	// writeJSON(w, block)
-	// writeJSON(w, siacoins)
-	// writeJSON(w, filecontracts)
-	// fmt.Fprintf(w, "\n")
-	// hr := rateString(hashrate(blocklist[0:chainheight]))
-	// fmt.Fprintf(w, "Average Hash Rate (All time): %s\n", hr)
-	// hr = rateString(hashrate(blocklist[chainheight-400:chainheight-300]))
-	// fmt.Fprintf(w, "Average Hash Rate (last 20 blocks): %s\n", hr)
-	// writeJSON(w, blocklist)
 }
 
 // Handles the root page being requested. Is responsible for
@@ -108,6 +93,6 @@ func main() {
 
 	srv.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
 	http.HandleFunc("/", srv.rootHandler)
-	http.ListenAndServe(":9983", nil)
+	http.ListenAndServe(":9003", nil)
 	fmt.Println("Done serving")
 }
