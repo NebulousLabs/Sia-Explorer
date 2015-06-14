@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"strings"
@@ -57,7 +58,6 @@ func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 // Handles the root page being requested. Is responsible for
 // differentiating between api calls and pages
 func (srv *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
-
 	if (strings.Contains(r.URL.Path, ".")) {
 		srv.serveMux.ServeHTTP(w, r)
 	} else {
@@ -68,14 +68,20 @@ func (srv *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
 // TODO: parse port as a command line option
 
 func main() {
+	// Parse command line flags
+	apiPort := flag.String("a", "9980", "Api port")
+	hostPort := flag.String("p", "9983", "HTTP host port")
+	flag.Parse()
+
+
 	// Initilize the server
 	var srv = &ExploreServer{
-		siad: api.New("9000"),
+		siad: api.New(*apiPort),
 		serveMux: http.NewServeMux(),
 	}
 
 	srv.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
 	http.HandleFunc("/", srv.rootHandler)
-	http.ListenAndServe(":9003", nil)
+	http.ListenAndServe(":"+*hostPort, nil)
 	fmt.Println("Done serving")
 }
