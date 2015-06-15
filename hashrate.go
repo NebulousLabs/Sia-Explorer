@@ -19,7 +19,7 @@ func rateString(rate uint64) string {
 		i++
 	}
 
-	return fmt.Sprintf("%f%s", r, postfixes[i])
+	return fmt.Sprintf("%f %s", r, postfixes[i])
 }
 
 // The hashrate function takes in a slice of block data, each with a
@@ -41,7 +41,7 @@ func hashrate(blocks []modules.ExplorerBlockData) (rate uint64) {
 		sum = sum.AddDifficulties(blocks[i].Target)
 	}
 
-	hashes := new(big.Int).Div(types.RootDepth.Int(),sum.Int())
+	hashes := new(big.Int).Div(types.RootDepth.Int(), sum.Int())
 	rate = uint64(new(big.Int).Div(hashes, big.NewInt(int64(totaltime))).Int64())
 	return
 }

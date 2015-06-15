@@ -13,14 +13,13 @@ import (
 // This will be the root struct given to the template parser
 type overviewRoot struct {
 	Explorer modules.ExplorerStatus
-	Blocks []modules.ExplorerBlockData
+	Blocks   []modules.ExplorerBlockData
 }
 
 var funcMap = template.FuncMap{
-        "siacoinString": siacoinString,
+	"siacoinString": siacoinString,
 	"hashAvgString": hashAvgString,
 }
-
 
 var coinPostfixes []string = []string{"SC", "KS", "MS", "GS", "TS", "PS"}
 
@@ -40,12 +39,12 @@ func hashAvgString(blocks types.BlockHeight, o overviewRoot) (s string) {
 	if int(blocks) >= len(o.Blocks) {
 		return rateString(hashrate(o.Blocks))
 	}
-	s = rateString(hashrate(o.Blocks[o.Explorer.Height - blocks:o.Explorer.Height]))
+	s = rateString(hashrate(o.Blocks[o.Explorer.Height-blocks : o.Explorer.Height]))
 	return
 }
 
 // Function that handles the template parsing and execution of that template
-func parseOverview (data overviewRoot) ([]byte, error) {
+func parseOverview(data overviewRoot) ([]byte, error) {
 	t, err := template.New("overview").Funcs(funcMap).ParseGlob("templates/*.html")
 	if err != nil {
 		s := fmt.Sprintf("Error parsing overview template: %s", err.Error())
@@ -55,14 +54,14 @@ func parseOverview (data overviewRoot) ([]byte, error) {
 
 	// Use a bytes buffer to avoid requiring the writing
 	// object. This way we can return a byte slice
-        var doc bytes.Buffer
-        err = t.ExecuteTemplate(&doc, "overview.html", data)
+	var doc bytes.Buffer
+	err = t.ExecuteTemplate(&doc, "overview.html", data)
 	if err != nil {
 		s := fmt.Sprintf("Error executing overview template: %s", err.Error())
 		fmt.Println(s)
 		return nil, errors.New(s)
 	}
 
-        s := doc.Bytes()
+	s := doc.Bytes()
 	return s, nil
 }
