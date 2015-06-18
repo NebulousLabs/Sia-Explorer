@@ -25,20 +25,20 @@ func rateString(rate uint64) string {
 // The hashrate function takes in a slice of block data, each with a
 // timestamp and a target, and returns an estimated number of hashes
 // that were done per second
-func hashrate(blocks []modules.ExplorerBlockData) (rate uint64) {
-	if len(blocks) <= 0 {
+func hashrate(blockSummaries []modules.ExplorerBlockData) (rate uint64) {
+	if len(blockSummaries) <= 0 {
 		return 0
 	}
 
-	totaltime := blocks[len(blocks)-1].Timestamp - blocks[0].Timestamp
+	totaltime := blockSummaries[len(blockSummaries)-1].Timestamp - blockSummaries[0].Timestamp
 	if totaltime == 0 {
 		return 0
 	}
 
 	// find the total target
-	sum := blocks[0].Target
-	for i := 1; i < len(blocks); i++ {
-		sum = sum.AddDifficulties(blocks[i].Target)
+	sum := blockSummaries[0].Target
+	for i := 1; i < len(blockSummaries); i++ {
+		sum = sum.AddDifficulties(blockSummaries[i].Target)
 	}
 
 	hashes := new(big.Int).Div(types.RootDepth.Int(), sum.Int())

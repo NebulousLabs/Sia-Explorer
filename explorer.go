@@ -41,8 +41,8 @@ func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 	}
 	// Attempt to make a page out of it
 	page, err := parseOverview(overviewRoot{
-		Explorer: explorerState,
-		Blocks:   blocklist,
+		Explorer:       explorerState,
+		BlockSummaries: blocklist,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)

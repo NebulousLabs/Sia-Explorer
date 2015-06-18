@@ -12,8 +12,8 @@ import (
 
 // This will be the root struct given to the template parser
 type overviewRoot struct {
-	Explorer modules.ExplorerStatus
-	Blocks   []modules.ExplorerBlockData
+	Explorer       modules.ExplorerStatus
+	BlockSummaries []modules.ExplorerBlockData
 }
 
 var funcMap = template.FuncMap{
@@ -35,11 +35,11 @@ func siacoinString(siacoins types.Currency) string {
 	return fmt.Sprintf("%f %s", coins, coinPostfixes[i])
 }
 
-func hashAvgString(blocks types.BlockHeight, o overviewRoot) (s string) {
-	if int(blocks) >= len(o.Blocks) {
-		return rateString(hashrate(o.Blocks))
+func hashAvgString(numBlocks types.BlockHeight, o overviewRoot) (s string) {
+	if int(numBlocks) >= len(o.BlockSummaries) {
+		return rateString(hashrate(o.BlockSummaries))
 	}
-	s = rateString(hashrate(o.Blocks[o.Explorer.Height-blocks : o.Explorer.Height]))
+	s = rateString(hashrate(o.BlockSummaries[o.Explorer.Height-numBlocks : o.Explorer.Height]))
 	return
 }
 

@@ -49,15 +49,15 @@ func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.Bloc
 	v := url.Values{}
 	v.Set("start", strconv.Itoa(int(start)))
 	v.Add("finish", strconv.Itoa(int(end)))
-	blocksJson, err := es.apiGet("/blockexplorer/blockdata?" + v.Encode())
+	blockSumJson, err := es.apiGet("/blockexplorer/blockdata?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
 
-	var blocks []modules.ExplorerBlockData
+	var blockSummaries []modules.ExplorerBlockData
 
 	// Attepmt to interpret as a block
-	err = json.Unmarshal(blocksJson, &blocks)
+	err = json.Unmarshal(blockSumJson, &blockSummaries)
 
-	return blocks, err
+	return blockSummaries, err
 }
