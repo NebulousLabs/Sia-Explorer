@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,16 +11,12 @@ import (
 // A structure to store any state of the server. Should remain
 // relatively unpopulated, mostly constants which will eventually be
 // broken off
-type ExploreServerData struct {
+type ExploreServer struct {
 	// The explorer must know where to send the API calls
-	SiaDaemonUrl string
-
-	// BlockTemplatePath should hold the path to the html template
-	// file used to display the block
-	BlockTemplatePath string
+	url string
 
 	// Used to store the server muxer
-	ServeMux *http.ServeMux
+	serveMux *http.ServeMux
 }
 
 // writeJSON writes the object to the ResponseWriter. If the encoding fails, an
@@ -30,37 +27,55 @@ func writeJSON(w http.ResponseWriter, obj interface{}) {
 	}
 }
 
-func (srv *ExploreServerData) homePage(w http.ResponseWriter, r *http.Request) {
-	block, err := srv.apiGetBlock()
+func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
+	// First query the local instance of siad for the status
+	explorerState, err := srv.apiExplorerState()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	blocklist, err := srv.apiGetBlockData(0, explorerState.Height)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	// Attempt to make a page out of it
+	page, err := parseOverview(overviewRoot{
+		Explorer:       explorerState,
+		BlockSummaries: blocklist,
+	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	writeJSON(w, block)
+	w.Write(page)
 }
 
 // Handles the root page being requested. Is responsible for
 // differentiating between api calls and pages
-func (srv *ExploreServerData) rootHandler(w http.ResponseWriter, r *http.Request) {
-
-	if (strings.Contains(r.URL.Path, ".")) {
-		srv.ServeMux.ServeHTTP(w, r)
+func (srv *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
+	if strings.Contains(r.URL.Path, ".") {
+		srv.serveMux.ServeHTTP(w, r)
 	} else {
-		srv.homePage(w, r)
+		srv.overviewPage(w, r)
 	}
 }
 
 func main() {
-	// Initilize Server variable
-	var srv = ExploreServerData{
-		SiaDaemonUrl: "http://localhost:9980",
-		BlockTemplatePath: "templates/curblock.template",
-		ServeMux: http.NewServeMux(),
+	// Parse command line flags for port numbers
+	apiPort := flag.String("a", "9980", "Api port")
+	hostPort := flag.String("p", "9983", "HTTP host port")
+	flag.Parse()
+
+	// Initilize the server
+	var srv = &ExploreServer{
+		url:      "http://localhost:" + *apiPort,
+		serveMux: http.NewServeMux(),
 	}
 
-	srv.ServeMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
+	srv.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
 	http.HandleFunc("/", srv.rootHandler)
-	http.ListenAndServe(":9983", nil)
+	http.ListenAndServe(":"+*hostPort, nil)
 	fmt.Println("Done serving")
 }

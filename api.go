@@ -5,40 +5,59 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strconv"
 
+	"github.com/NebulousLabs/Sia/modules"
 	"github.com/NebulousLabs/Sia/types"
 )
 
-// Does an arbitrary request to the server referenced at srv, returns as a byte array.
-func (srv *ExploreServerData) apiGet (api_call string) (response []byte, err error) {
+// Does an arbitrary request to the server referenced by link, returns as a byte array.
+func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 	// Do a http request to the sia daemon
-	resp, err := http.Get(srv.SiaDaemonUrl+api_call)
+	resp, err := http.Get(es.url + apiCall)
 	if err != nil {
+		// err is already set
 		return
 	}
-	if resp.StatusCode != 200 {
-		err = errors.New("Sia Daemon Returned Non-200 code")
-		return
-	}
-
 
 	defer resp.Body.Close()
 	response, err = ioutil.ReadAll(resp.Body)
 
-	// Returns error if there is one
+	if resp.StatusCode != 200 {
+		err = errors.New("Sia Daemon Returned Non-200: " + string(response))
+		return
+	}
+
 	return
 }
 
-// Wrapper around apiGet that parses into a block object
-func (srv *ExploreServerData) apiGetBlock() (b types.Block, err error) {
-	blockJson, err := srv.apiGet("/blockexplorer/currentblock")
+// ExplorerState queries the locally running statu
+func (es *ExploreServer) apiExplorerState() (explorerStatus modules.ExplorerStatus, err error) {
+	stateJSON, err := es.apiGet("/blockexplorer/status")
 	if err != nil {
 		return
 	}
 
-	// Attepmt to interpret as a block
-	err = json.Unmarshal(blockJson, &b)
+	err = json.Unmarshal(stateJSON, &explorerStatus)
 
-	// Returs the error if there is one too
 	return
+}
+
+// GetBlockData queries a range of blocks from the server, and returns that list
+func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.BlockHeight) ([]modules.ExplorerBlockData, error) {
+	v := url.Values{}
+	v.Set("start", strconv.Itoa(int(start)))
+	v.Add("finish", strconv.Itoa(int(end)))
+	blockSumJson, err := es.apiGet("/blockexplorer/blockdata?" + v.Encode())
+	if err != nil {
+		return nil, err
+	}
+
+	var blockSummaries []modules.ExplorerBlockData
+
+	// Attepmt to interpret as a block
+	err = json.Unmarshal(blockSumJson, &blockSummaries)
+
+	return blockSummaries, err
 }

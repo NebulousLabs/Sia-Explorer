@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>Sia Blockchain Explorer Alpha</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+	<td>Current Blockchain Height</td>
+	<td>{{.Explorer.Height}}</td>
+      </tr>
+      <tr>
+	<td>Total Siacoin</td>
+	<td>{{siacoinString .Explorer.TotalCurrency}}</td>
+      </tr>
+      <tr>
+	<td>File Contracts</td>
+	<td>{{.Explorer.ActiveContractCount}}</td>
+      </tr>
+      <tr>
+	<td>Siacoin spent on file contracts</td>
+	<td>{{siacoinString .Explorer.ActiveContractCosts}}</td>
+      </tr>
+      <tr>
+	<td>Hash rate (last 1000 blocks)</td>
+	<td>{{hashAvgString 1000 .}}</td>
+      </tr>
+      <tr>
+	<td>Hash rate (last 100 blocks)</td>
+	<td>{{hashAvgString 100 .}}</td>
+      </tr>
+      <tr>
+	<td>Hash rate (last 25 blocks)</td>
+	<td>{{hashAvgString 25 .}}</td>
+      </tr>
+
+    </table>
+  </body>
+</html>
