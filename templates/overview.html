@@ -14,12 +14,28 @@
 	<td>{{siacoinString .Explorer.TotalCurrency}}</td>
       </tr>
       <tr>
-	<td>File Contracts</td>
+	<td>Active file contracts</td>
 	<td>{{.Explorer.ActiveContractCount}}</td>
       </tr>
       <tr>
-	<td>Siacoin spent on file contracts</td>
+	<td>Size of active file contracts</td>
+	<td>{{.Explorer.ActiveContractSize}}</td>
+      </tr>
+      <tr>
+	<td>Siacoin spent on active file contracts</td>
 	<td>{{siacoinString .Explorer.ActiveContractCosts}}</td>
+      </tr>
+      <tr>
+	<td>Total file contracts</td>
+	<td>{{.Explorer.TotalContractCount}}</td>
+      </tr>
+      <tr>
+	<td>Size of all file contracts</td>
+	<td>{{.Explorer.TotalContractSize}}</td>
+      </tr>
+      <tr>
+	<td>Total Siacoin spent on file contracts</td>
+	<td>{{siacoinString .Explorer.TotalContractCosts}}</td>
       </tr>
       <tr>
 	<td>Hash rate (last 1000 blocks)</td>
