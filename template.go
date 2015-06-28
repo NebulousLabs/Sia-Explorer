@@ -18,10 +18,12 @@ type overviewRoot struct {
 
 var funcMap = template.FuncMap{
 	"siacoinString": siacoinString,
+	"byteString":    byteString,
 	"hashAvgString": hashAvgString,
 }
 
 var coinPostfixes []string = []string{"SC", "KS", "MS", "GS", "TS", "PS"}
+var bytePostfixes []string = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
 func siacoinString(siacoins types.Currency) string {
 	coins := float64(siacoins.Div(types.SiacoinPrecision).Big().Int64())
@@ -33,6 +35,18 @@ func siacoinString(siacoins types.Currency) string {
 	}
 
 	return fmt.Sprintf("%f %s", coins, coinPostfixes[i])
+}
+
+func byteString(numBytes uint64) string {
+	numBytesF := float64(numBytes)
+
+	var i int = 0
+	for numBytesF > 1024 {
+		numBytesF = numBytesF / 1024
+		i++
+	}
+
+	return fmt.Sprintf("%f %s", numBytesF, bytePostfixes[i])
 }
 
 func hashAvgString(numBlocks types.BlockHeight, o overviewRoot) (s string) {
