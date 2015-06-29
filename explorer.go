@@ -40,7 +40,7 @@ func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Attempt to make a page out of it
-	page, err := parseOverview(overviewRoot{
+	page, err := parseTemplate("overview.html", overviewRoot{
 		Explorer:       explorerState,
 		BlockSummaries: blocklist,
 	})
@@ -69,13 +69,14 @@ func main() {
 	flag.Parse()
 
 	// Initilize the server
-	var srv = &ExploreServer{
+	var es = &ExploreServer{
 		url:      "http://localhost:" + *apiPort,
 		serveMux: http.NewServeMux(),
 	}
 
-	srv.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
-	http.HandleFunc("/", srv.rootHandler)
+	es.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
+	http.HandleFunc("/", es.rootHandler)
+	http.HandleFunc("/hash", es.hashPageHandler)
 	http.ListenAndServe(":"+*hostPort, nil)
 	fmt.Println("Done serving")
 }

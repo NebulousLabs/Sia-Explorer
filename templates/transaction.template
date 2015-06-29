@@ -1,0 +1,43 @@
+{{$root := .}}
+  <h1>Transaction</h1>
+    <table>
+      <tr>
+	<td>Transaction ID</td>
+	<td>{{printf "%x" .Tx.ID}}</td>
+      </tr>
+      <tr>
+	<td>Block ID</td>
+	<td><a href='hash?h={{printf "%x" .ParentID}}'>{{printf "%x" .ParentID}}</a></td>
+      </tr>
+      <tr>
+	<td>Siacoin Inputs</td>
+	<td>
+	  <ul>
+	    {{range .Tx.SiacoinInputs}}
+	    <li><a href='hash?h={{printf "%x" .ParentID}}'>{{printf "%x" .ParentID}}</a></li>
+	    {{end}}
+	  </ul>
+	</td>
+      </tr>
+      <tr>
+	<td>Siacoin Outputs</td>
+	<td>
+	  <table>
+	    <tr>
+	      <td>Output ID</td>
+	      <td>Amount</td>
+	      <td>Address</td>
+	    </tr>
+	    {{range $index, $element := .Tx.SiacoinOutputs}}
+	    <tr>
+	      <td><a href='hash?h={{$index | $root.Tx.SiacoinOutputID | printf "%x"}}'>
+		  {{$index | $root.Tx.SiacoinOutputID | printf "%x"}}
+	      </a></td>
+	      <td>{{siacoinString $element.Value}}</td>
+	      <td>{{$element.UnlockHash.String}}</td>
+	    </tr>
+	    {{end}}
+	  </table>
+	</td>
+      </tr>
+    </table>

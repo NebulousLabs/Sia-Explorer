@@ -1,0 +1,5 @@
+<html>{{$root := .}}
+  <head>
+    <title>Sia Block Explorer Alpha - {{.}}</title>
+  </head>
+  <body>

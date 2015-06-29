@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 
+	"github.com/NebulousLabs/Sia/crypto"
 	"github.com/NebulousLabs/Sia/modules"
 	"github.com/NebulousLabs/Sia/types"
 )
@@ -60,4 +62,16 @@ func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.Bloc
 	err = json.Unmarshal(blockSumJson, &blockSummaries)
 
 	return blockSummaries, err
+}
+
+// apiGetHash queries the running instance of siad and returns the raw data to the calling function
+func (es *ExploreServer) apiGetHash(hash crypto.Hash) ([]byte, error) {
+	v := url.Values{}
+	v.Set("hash", fmt.Sprintf("%x", hash))
+	resultJSON, err := es.apiGet("/blockexplorer/gethash?" + v.Encode())
+	if err != nil {
+		return nil, err
+	}
+
+	return resultJSON, nil
 }

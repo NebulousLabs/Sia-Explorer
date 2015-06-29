@@ -1,0 +1,34 @@
+{{$root := .}}
+  <h1>Block {{.Height}}</h1>
+    <table>
+      <tr>
+	<td>Block ID</td>
+	<td>{{printf "%x" .Block.ID}}</td>
+      </tr>
+      <tr>
+	<td>Block Parent ID</td>
+	<td><a href='hash?h={{printf "%x" .Block.ParentID}}'>{{printf "%x" .Block.ParentID}}</a></td>
+      </tr>
+      <tr>
+	<td>Block Timestamp</td>
+	<td>{{timeString .Block.Timestamp}}</td>
+      </tr>
+      <tr>
+	<td>Block Target</td>
+	<td>{{printf "%x" .Target}}</td>
+      </tr>
+      <tr>
+	<td>Block Size</td>
+	<td>{{byteString .Size}}</td>
+      </tr>
+      <tr>p
+	<td>Transcations</td>
+	<td>
+	  <ul>
+	    {{range .Block.Transactions}}
+	    <li><a href='hash?h={{printf "%x" .ID}}'>{{printf "%x" .ID}}</a></li>
+	    {{end}}
+	  </ul>
+	</td>
+      </tr>
+    </table>
