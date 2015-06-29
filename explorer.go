@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/NebulousLabs/Sia/types"
 )
 
 // A structure to store any state of the server. Should remain
@@ -27,14 +29,14 @@ func writeJSON(w http.ResponseWriter, obj interface{}) {
 	}
 }
 
-func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
+func (es *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 	// First query the local instance of siad for the status
-	explorerState, err := srv.apiExplorerState()
+	explorerState, err := es.apiExplorerState()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	blocklist, err := srv.apiGetBlockData(0, explorerState.Height)
+	blocklist, err := es.apiGetBlockData(0, explorerState.Height)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -52,13 +54,33 @@ func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 	w.Write(page)
 }
 
+// heightHandler handles the request to get a block by block height by
+// redirecting the request to the relevant block ID
+func (es *ExploreServer) heightHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract the height
+	var height types.BlockHeight
+	_, err := fmt.Sscanf(r.FormValue("h"), "%d", &height)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	// Request info on that height
+	blockSummaries, err := es.apiGetBlockData(height, height+1)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("hash?h=%x", blockSummaries[0].ID), 301)
+}
+
 // Handles the root page being requested. Is responsible for
 // differentiating between api calls and pages
-func (srv *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
+func (es *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(r.URL.Path, ".") {
-		srv.serveMux.ServeHTTP(w, r)
+		es.serveMux.ServeHTTP(w, r)
 	} else {
-		srv.overviewPage(w, r)
+		es.overviewPage(w, r)
 	}
 }
 
@@ -77,6 +99,7 @@ func main() {
 	es.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
 	http.HandleFunc("/", es.rootHandler)
 	http.HandleFunc("/hash", es.hashPageHandler)
+	http.HandleFunc("/height", es.heightHandler)
 	http.ListenAndServe(":"+*hostPort, nil)
 	fmt.Println("Done serving")
 }

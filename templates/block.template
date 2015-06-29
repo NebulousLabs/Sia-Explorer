@@ -10,6 +10,10 @@
 	<td><a href='hash?h={{printf "%x" .Block.ParentID}}'>{{printf "%x" .Block.ParentID}}</a></td>
       </tr>
       <tr>
+	<td>Child</td>
+	<td><a href='height?h={{increment .Height}}'>Block {{increment .Height}}</a></td>
+      </tr>
+      <tr>
 	<td>Block Timestamp</td>
 	<td>{{timeString .Block.Timestamp}}</td>
       </tr>
@@ -52,5 +56,6 @@
 	    </tr>
 	    {{end}}
 	  </table>
+	</td>
       </tr>
     </table>

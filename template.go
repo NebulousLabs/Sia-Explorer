@@ -31,6 +31,7 @@ var funcMap = template.FuncMap{
 	"byteString":    byteString,
 	"hashAvgString": hashAvgString,
 	"timeString":    timeString,
+	"increment":     func(x types.BlockHeight) types.BlockHeight { return x + 1 },
 }
 
 var coinPostfixes []string = []string{"SC", "KS", "MS", "GS", "TS", "PS"}

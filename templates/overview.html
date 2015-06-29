@@ -49,7 +49,16 @@
 	<td>Hash rate (last 25 blocks)</td>
 	<td>{{hashAvgString 25 .}}</td>
       </tr>
-
     </table>
+    <h4>Request Hash</h4>
+    <form action='hash' method="get">
+      <input type="text" name="h" style="width:500px" />
+      <input type="submit" name="submit" value="Submit" />
+    </form>
+    <h4>Block By Height</h4>
+    <form action='height' method="get">
+      <input type="text" name="h" style="width:500px" />
+      <input type="submit" name="submit" value="Submit" />
+    </form>
   </body>
 </html>
