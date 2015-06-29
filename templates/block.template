@@ -1,5 +1,5 @@
-{{$root := .}}
-  <h1>Block {{.Height}}</h1>
+  <!-- {{$root := .}} -->
+  <h3>Block {{.Height}}</h3>
     <table>
       <tr>
 	<td>Block ID</td>
@@ -21,7 +21,7 @@
 	<td>Block Size</td>
 	<td>{{byteString .Size}}</td>
       </tr>
-      <tr>p
+      <tr>
 	<td>Transcations</td>
 	<td>
 	  <ul>
@@ -30,5 +30,27 @@
 	    {{end}}
 	  </ul>
 	</td>
+      </tr>
+      <tr>
+	<td>Miner Payouts</td>
+	<td>
+	  <table>
+	    <tr>
+	      <td>Output ID</td>
+	      <td>Amount</td>
+	      <td>Address</td>
+      	    </tr>
+	    {{range $index, $element := .Block.MinerPayouts}}
+	    <tr>
+	      <td>
+		<a href='hash?h={{$index | $root.Block.MinerPayoutID | printf "%x"}}'>
+		  {{$index | $root.Block.MinerPayoutID | printf "%x"}}
+		</a>
+	      </td>
+	      <td>{{siacoinString $element.Value}}</td>
+	      <td><a href='hash?h={{$element.UnlockHash.String}}'>{{$element.UnlockHash.String}}</a></td>
+	    </tr>
+	    {{end}}
+	  </table>
       </tr>
     </table>

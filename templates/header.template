@@ -3,3 +3,4 @@
     <title>Sia Block Explorer Alpha - {{.}}</title>
   </head>
   <body>
+    <h1>{{.}}</h1>

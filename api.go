@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/NebulousLabs/Sia/crypto"
 	"github.com/NebulousLabs/Sia/modules"
 	"github.com/NebulousLabs/Sia/types"
 )
@@ -65,7 +64,7 @@ func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.Bloc
 }
 
 // apiGetHash queries the running instance of siad and returns the raw data to the calling function
-func (es *ExploreServer) apiGetHash(hash crypto.Hash) ([]byte, error) {
+func (es *ExploreServer) apiGetHash(hash []byte) ([]byte, error) {
 	v := url.Values{}
 	v.Set("hash", fmt.Sprintf("%x", hash))
 	resultJSON, err := es.apiGet("/blockexplorer/gethash?" + v.Encode())
