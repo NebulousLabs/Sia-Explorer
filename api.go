@@ -63,7 +63,10 @@ func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.Bloc
 	return blockSummaries, err
 }
 
-// apiGetHash queries the running instance of siad and returns the raw data to the calling function
+// apiGetHash queries the running instance of siad and returns the raw
+// data to the calling function. The json data could decode into
+// multiple types of structures, all of which *should* have the
+// ResponseType field as a string for identifying the type of data
 func (es *ExploreServer) apiGetHash(hash []byte) ([]byte, error) {
 	v := url.Values{}
 	v.Set("hash", fmt.Sprintf("%x", hash))

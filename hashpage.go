@@ -65,8 +65,6 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	fmt.Printf("Type of response: %s\n", rd.ResponseType)
-
 	switch rd.ResponseType {
 	case "Block":
 		es.blockPage(w, itemJSON)
@@ -81,7 +79,6 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 		es.addressPage(w, itemJSON, d)
 		return
 	default:
-		//fmt.Printf("Unrecognized value:\n%s", item)
 		http.Error(w, "Siad returned: "+string(itemJSON), 500)
 	}
 }
@@ -114,6 +111,8 @@ func (es *ExploreServer) parseTransactions(hashes []crypto.Hash) ([]byte, error)
 				return nil, err
 			}
 
+			// The block page requires additional
+			// information contained in the block summary
 			blockSummaries, err := es.apiGetBlockData(b.Height, b.Height+1)
 			if err != nil {
 				return nil, err
@@ -173,6 +172,7 @@ func (es *ExploreServer) blockPage(w http.ResponseWriter, blockJSON []byte) {
 		return
 	}
 
+	// blockRoot is defined in template.go
 	parsed, err := parseTemplate("block.template", blockRoot{
 		Block:  b.Block,
 		Height: b.Height,
