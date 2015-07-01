@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/NebulousLabs/Sia/crypto"
-	"github.com/NebulousLabs/Sia/types"
+	"github.com/NebulousLabs/Sia/modules"
 )
 
 // Redefine the structs sent by the blockexplorer here. As they are
@@ -16,32 +16,6 @@ import (
 type (
 	responseData struct {
 		ResponseType string
-	}
-
-	blockData struct {
-		Block  types.Block
-		Height types.BlockHeight
-	}
-
-	txData struct {
-		Tx       types.Transaction
-		ParentID types.BlockID
-		TxNum    int
-	}
-
-	fcInfo struct {
-		Contract  crypto.Hash
-		Revisions []crypto.Hash
-		Proof     crypto.Hash
-	}
-
-	outputTransactions struct {
-		OutputTx crypto.Hash
-		InputTx  crypto.Hash
-	}
-
-	addrData struct {
-		Txns []crypto.Hash
 	}
 )
 
@@ -105,7 +79,7 @@ func (es *ExploreServer) parseTransactions(hashes []crypto.Hash) ([]byte, error)
 
 		switch rd.ResponseType {
 		case "Block":
-			var b blockData
+			var b modules.BlockResponse
 			err := json.Unmarshal(itemJSON, &b)
 			if err != nil {
 				return nil, err
@@ -131,7 +105,7 @@ func (es *ExploreServer) parseTransactions(hashes []crypto.Hash) ([]byte, error)
 
 			continue
 		case "Transaction":
-			var t txData
+			var t modules.TransactionResponse
 			err := json.Unmarshal(itemJSON, &t)
 			if err != nil {
 				return nil, err
@@ -152,7 +126,7 @@ func (es *ExploreServer) parseTransactions(hashes []crypto.Hash) ([]byte, error)
 
 // blockPage formats information about a block for viewing
 func (es *ExploreServer) blockPage(w http.ResponseWriter, blockJSON []byte) {
-	var b blockData
+	var b modules.BlockResponse
 	err := json.Unmarshal(blockJSON, &b)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -199,7 +173,7 @@ func (es *ExploreServer) blockPage(w http.ResponseWriter, blockJSON []byte) {
 // txPage formats information about a transaction in a format suitable
 // for human viewing
 func (es *ExploreServer) txPage(w http.ResponseWriter, txJSON []byte) {
-	var t txData
+	var t modules.TransactionResponse
 	err := json.Unmarshal(txJSON, &t)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -234,7 +208,7 @@ func (es *ExploreServer) txPage(w http.ResponseWriter, txJSON []byte) {
 
 // outputPage formats an outputTransactions struct for use in viewing
 func (es *ExploreServer) outputPage(w http.ResponseWriter, outJSON []byte, oID []byte) {
-	var ot outputTransactions
+	var ot modules.OutputResponse
 	err := json.Unmarshal(outJSON, &ot)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -269,7 +243,7 @@ func (es *ExploreServer) outputPage(w http.ResponseWriter, outJSON []byte, oID [
 // addressPage formats the list of transactions that an address
 // participated in for human consumption
 func (es *ExploreServer) addressPage(w http.ResponseWriter, addrJSON []byte, address []byte) {
-	var ad addrData
+	var ad modules.AddrResponse
 	err := json.Unmarshal(addrJSON, &ad)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -303,7 +277,7 @@ func (es *ExploreServer) addressPage(w http.ResponseWriter, addrJSON []byte, add
 }
 
 func (es *ExploreServer) contractPage(w http.ResponseWriter, fcJSON []byte, fcid []byte) {
-	var fi fcInfo
+	var fi modules.FcResponse
 	err := json.Unmarshal(fcJSON, &fi)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
