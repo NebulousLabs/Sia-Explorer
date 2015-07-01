@@ -7,6 +7,7 @@ import (
 
 	"github.com/NebulousLabs/Sia/crypto"
 	"github.com/NebulousLabs/Sia/modules"
+	"github.com/NebulousLabs/Sia/types"
 )
 
 // Redefine the structs sent by the blockexplorer here. As they are
@@ -57,6 +58,61 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
+	// Don't attempt to parse zero hashes
+	if hash == *new(crypto.Hash) {
+		return []byte{}, nil
+	}
+	// Decode into a responseData struct to figure out
+	// what type of response it is, then switch on it
+	itemJSON, err := es.apiGetHash(hash[:])
+	var rd responseData
+	err = json.Unmarshal(itemJSON, &rd)
+	if err != nil {
+		return nil, err
+	}
+
+	switch rd.ResponseType {
+	case "Block":
+		var b modules.BlockResponse
+		err := json.Unmarshal(itemJSON, &b)
+		if err != nil {
+			return nil, err
+		}
+
+		// The block page requires additional
+		// information contained in the block summary
+		blockSummaries, err := es.apiGetBlockData(b.Height, b.Height+1)
+		if err != nil {
+			return nil, err
+		}
+
+		parsed, err := es.parseTemplate("block.template", blockRoot{
+			Block:  b.Block,
+			Height: b.Height,
+			Target: blockSummaries[0].Target,
+			Size:   blockSummaries[0].Size,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return parsed, nil
+	case "Transaction":
+		var t modules.TransactionResponse
+		err := json.Unmarshal(itemJSON, &t)
+		if err != nil {
+			return nil, err
+		}
+		// Parse the main transaction template
+		parsed, err := es.parseTemplate("transaction.template", t)
+		if err != nil {
+			return nil, err
+		}
+		return parsed, nil
+	}
+	return []byte{}, nil
+}
+
 // parseTransactions iterates over a list of transactions and puts
 // each one into an html template, returning the concatinated list
 func (es *ExploreServer) parseTransactions(hashes []crypto.Hash) ([]byte, error) {
@@ -64,62 +120,11 @@ func (es *ExploreServer) parseTransactions(hashes []crypto.Hash) ([]byte, error)
 
 	// Request all the other things to be viewed
 	for _, hash := range hashes {
-		// Don't attempt to parse zero hashes
-		if hash == *new(crypto.Hash) {
-			continue
-		}
-		// Decode into a responseData struct to figure out
-		// what type of response it is, then switch on it
-		itemJSON, err := es.apiGetHash(hash[:])
-		var rd responseData
-		err = json.Unmarshal(itemJSON, &rd)
+		parsed, err := es.parseTransaction(hash)
 		if err != nil {
 			return nil, err
 		}
-
-		switch rd.ResponseType {
-		case "Block":
-			var b modules.BlockResponse
-			err := json.Unmarshal(itemJSON, &b)
-			if err != nil {
-				return nil, err
-			}
-
-			// The block page requires additional
-			// information contained in the block summary
-			blockSummaries, err := es.apiGetBlockData(b.Height, b.Height+1)
-			if err != nil {
-				return nil, err
-			}
-
-			parsed, err := parseTemplate("block.template", blockRoot{
-				Block:  b.Block,
-				Height: b.Height,
-				Target: blockSummaries[0].Target,
-				Size:   blockSummaries[0].Size,
-			})
-			if err != nil {
-				return nil, err
-			}
-			page = append(page, parsed...)
-
-			continue
-		case "Transaction":
-			var t modules.TransactionResponse
-			err := json.Unmarshal(itemJSON, &t)
-			if err != nil {
-				return nil, err
-			}
-			// Parse the main transaction template
-			parsed, err := parseTemplate("transaction.template", t)
-			if err != nil {
-				return nil, err
-			}
-			page = append(page, parsed...)
-			continue
-		default:
-			continue
-		}
+		page = append(page, parsed...)
 	}
 	return page, nil
 }
@@ -139,15 +144,8 @@ func (es *ExploreServer) blockPage(w http.ResponseWriter, blockJSON []byte) {
 		return
 	}
 
-	// Parse the header template
-	page, err := parseTemplate("header.template", "Block "+fmt.Sprintf("%d", b.Height))
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
 	// blockRoot is defined in template.go
-	parsed, err := parseTemplate("block.template", blockRoot{
+	page, err := es.parseTemplate("block.html", blockRoot{
 		Block:  b.Block,
 		Height: b.Height,
 		Target: blockSummaries[0].Target,
@@ -157,16 +155,6 @@ func (es *ExploreServer) blockPage(w http.ResponseWriter, blockJSON []byte) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	page = append(page, parsed...)
-
-	// Parse the footer template
-	parsed, err = parseTemplate("footer.template", "Block "+fmt.Sprintf("%d", b.Height))
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	page = append(page, parsed...)
-
 	w.Write(page)
 }
 
@@ -180,29 +168,12 @@ func (es *ExploreServer) txPage(w http.ResponseWriter, txJSON []byte) {
 		return
 	}
 
-	// Parse the header template
-	page, err := parseTemplate("header.template", "Transaction")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
 	// Parse the main transaction template
-	parsed, err := parseTemplate("transaction.template", t)
+	page, err := es.parseTemplate("transaction.html", t)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	page = append(page, parsed...)
-
-	// Parse the footer template
-	parsed, err = parseTemplate("footer.template", "Transaction")
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	page = append(page, parsed...)
-
 	w.Write(page)
 }
 
@@ -215,28 +186,19 @@ func (es *ExploreServer) outputPage(w http.ResponseWriter, outJSON []byte, oID [
 		return
 	}
 
-	// Parse header template
-	page, err := parseTemplate("header.template", fmt.Sprintf("Output %x", oID))
+	var outputID crypto.Hash
+	copy(outputID[:], oID[:])
+
+	// Parse the main output template
+	page, err := es.parseTemplate("output.html", outputRoot{
+		OutputTx: ot.OutputTx,
+		InputTx:  ot.InputTx,
+		OutputID: outputID,
+	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
-	parsed, err := es.parseTransactions([]crypto.Hash{ot.OutputTx, ot.InputTx})
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	page = append(page, parsed...)
-
-	// Parse the footer template
-	parsed, err = parseTemplate("footer.template", fmt.Sprintf("Output ID %x", oID))
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	page = append(page, parsed...)
-
 	w.Write(page)
 }
 
@@ -251,28 +213,14 @@ func (es *ExploreServer) addressPage(w http.ResponseWriter, addrJSON []byte, add
 	}
 
 	// Parse header template
-	page, err := parseTemplate("header.template", fmt.Sprintf("Address %x", address))
+	page, err := es.parseTemplate("address.html", addressRoot{
+		Txns: ad.Txns,
+		Addr: address,
+	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
-	// Call the function to parse all of the transactions
-	parsed, err := es.parseTransactions(ad.Txns)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	page = append(page, parsed...)
-
-	// Parse the footer template
-	parsed, err = parseTemplate("footer.template", fmt.Sprintf("Address %x", address))
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	page = append(page, parsed...)
-
 	w.Write(page)
 }
 
@@ -284,31 +232,19 @@ func (es *ExploreServer) contractPage(w http.ResponseWriter, fcJSON []byte, fcid
 		return
 	}
 
+	var FcID types.FileContractID
+	copy(FcID[:], fcid[:])
+
 	// Parse header template
-	page, err := parseTemplate("header.template", fmt.Sprintf("File Contract %x", fcid))
+	page, err := es.parseTemplate("contract.html", filecontractRoot{
+		Contract:  fi.Contract,
+		Revisions: fi.Revisions,
+		Proof:     fi.Proof,
+		FcID:      FcID,
+	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
-	txns := []crypto.Hash{fi.Contract}
-	txns = append(txns, fi.Revisions...)
-	txns = append(txns, fi.Proof)
-	// Call the parseTransactions function to help with all the transactions
-	parsed, err := es.parseTransactions(txns)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	page = append(page, parsed...)
-
-	// Parse the footer template
-	parsed, err = parseTemplate("footer.template", fmt.Sprintf("File Contract %x", fcid))
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	page = append(page, parsed...)
-
 	w.Write(page)
 }

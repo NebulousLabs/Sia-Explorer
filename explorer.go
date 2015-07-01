@@ -42,7 +42,7 @@ func (es *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Attempt to make a page out of it
-	page, err := parseTemplate("overview.html", overviewRoot{
+	page, err := es.parseTemplate("overview.html", overviewRoot{
 		Explorer:       explorerState,
 		BlockSummaries: blocklist,
 	})

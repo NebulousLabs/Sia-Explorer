@@ -7,6 +7,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/NebulousLabs/Sia/crypto"
 	"github.com/NebulousLabs/Sia/modules"
 	"github.com/NebulousLabs/Sia/types"
 )
@@ -24,22 +25,32 @@ type (
 		Target types.Target
 		Size   uint64
 	}
-)
 
-// funcMap is passed to the template engine so that templates may have
-// access to these funcitons
-var funcMap = template.FuncMap{
-	"siacoinString": siacoinString,
-	"byteString":    byteString,
-	"hashAvgString": hashAvgString,
-	"timeString":    timeString,
-	"increment":     func(x types.BlockHeight) types.BlockHeight { return x + 1 },
-}
+	outputRoot struct {
+		OutputTx crypto.Hash
+		InputTx  crypto.Hash
+		OutputID crypto.Hash
+	}
+
+	filecontractRoot struct {
+		Contract  crypto.Hash
+		Revisions []crypto.Hash
+		Proof     crypto.Hash
+		FcID      types.FileContractID
+	}
+
+	addressRoot struct {
+		Txns []crypto.Hash
+		Addr []byte
+	}
+)
 
 // Used in siacoinString and byteString
 var coinPostfixes []string = []string{"SC", "KS", "MS", "GS", "TS", "PS"}
 var bytePostfixes []string = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
+// siacoinString, byteString, and timeString, are used for formatting
+// numbers in a human readable way inside the template
 func siacoinString(siacoins types.Currency) string {
 	coins := float64(siacoins.Div(types.SiacoinPrecision).Big().Int64())
 
@@ -83,7 +94,20 @@ func hashAvgString(numBlocks types.BlockHeight, o overviewRoot) (s string) {
 
 // parseTemplate is a more generic funciton to parse a template given
 // just a template filename and an object to be put into the template,
-func parseTemplate(templateName string, data interface{}) ([]byte, error) {
+func (es *ExploreServer) parseTemplate(templateName string, data interface{}) ([]byte, error) {
+
+	// funcMap is passed to the template engine so that templates may have
+	// access to these funcitons. Defined here to give acess to functions of es.
+	var funcMap = template.FuncMap{
+		"siacoinString":    siacoinString,
+		"byteString":       byteString,
+		"hashAvgString":    hashAvgString,
+		"timeString":       timeString,
+		"parseTemplate":    es.parseTemplate,
+		"parseTransaction": es.parseTransaction,
+		"increment":        func(x types.BlockHeight) types.BlockHeight { return x + 1 },
+	}
+
 	t, err := template.New(templateName).Funcs(funcMap).ParseFiles("templates/" + templateName)
 	if err != nil {
 		s := fmt.Sprintf("Error parsing template %s : %s", templateName, err.Error())
