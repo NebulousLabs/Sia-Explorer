@@ -45,9 +45,9 @@
     </table>
     <h4>File Contracts</h4>
     {{range $index, $element := .Tx.FileContracts}}
-    <h6><a href='hash?h={{$index | $root.Tx.FileContractID | printf "%x"}}>
+    <h5><a href='hash?h={{$index | $root.Tx.FileContractID | printf "%x"}}'>
 	{{$index | $root.Tx.FileContractID | printf "%x"}}
-    </a></h6>
+    </a></h5>
     <table>
       <tr>
 	<td>File Size</td>
@@ -66,11 +66,12 @@
 	      <td>Amount</td>
 	      <td>Address</td>
 	    </tr>
-	    {{range $FCindex, $FCelement := $element.ValidProofOutputst}}
+	    {{range $FCindex, $FCelement := $element.ValidProofOutputs}}
+	    {{$fcid := $root.Tx.FileContractID $FCindex}}
 	    <tr>
 	      <td>
-		<a href='hash?h={{$FCindex | $element.StorageProofOutputID true | printf "%x"}}'>
-		  {{$FCindex | $element.StorageProofOutputID | printf "%x"}}
+		<a href='hash?h={{$fcid.StorageProofOutputID true $FCindex | printf "%x"}}'>
+		  {{$fcid.StorageProofOutputID true $FCindex | printf "%x"}}
 		</a>
 	      </td>
 	      <td>{{siacoinString $FCelement.Value}}</td>

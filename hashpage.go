@@ -53,6 +53,8 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 	case "Address":
 		es.addressPage(w, itemJSON, d)
 		return
+	case "FileContract":
+		es.contractPage(w, itemJSON, d)
 	default:
 		http.Error(w, "Siad returned: "+string(itemJSON), 500)
 	}
