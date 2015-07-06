@@ -22,39 +22,39 @@ type (
 
 // hashPage handles the delegation of the pages depending on the hash type
 func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request) {
-	var d []byte
-	_, err := fmt.Sscanf(r.FormValue("h"), "%x", &d)
+	var hash []byte
+	_, err := fmt.Sscanf(r.FormValue("h"), "%x", &hash)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
 
-	itemJSON, err := es.apiGetHash(d)
+	itemJSON, err := es.apiGetHash(hash)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 
 	// Now decode the json and figure out which display function
 	// to dispatch it to.
 	var rd responseData
 	err = json.Unmarshal(itemJSON, &rd)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 
 	switch rd.ResponseType {
 	case "Block":
 		es.blockPage(w, itemJSON)
-		return
 	case "Transaction":
 		es.txPage(w, itemJSON)
-		return
 	case "Output":
-		es.outputPage(w, itemJSON, d[:crypto.HashSize])
-		return
+		es.outputPage(w, itemJSON, hash)
 	case "Address":
-		es.addressPage(w, itemJSON, d)
-		return
+		es.addressPage(w, itemJSON, hash)
 	case "FileContract":
-		es.contractPage(w, itemJSON, d)
+		es.contractPage(w, itemJSON, hash)
 	default:
 		http.Error(w, "Siad returned: "+string(itemJSON), 500)
 	}
@@ -62,12 +62,16 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 
 func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
 	// Don't attempt to parse zero hashes
-	if hash == *new(crypto.Hash) {
-		return []byte{}, nil
+	if hash == (crypto.Hash{}) {
+		return nil, nil
 	}
 	// Decode into a responseData struct to figure out
 	// what type of response it is, then switch on it
 	itemJSON, err := es.apiGetHash(hash[:])
+	if err != nil {
+		return nil, err
+	}
+
 	var rd responseData
 	err = json.Unmarshal(itemJSON, &rd)
 	if err != nil {
@@ -112,7 +116,7 @@ func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
 		}
 		return parsed, nil
 	}
-	return []byte{}, nil
+	return nil, nil
 }
 
 // parseTransactions iterates over a list of transactions and puts
