@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/NebulousLabs/Sia/types"
@@ -101,7 +102,7 @@ func main() {
 	err := http.ListenAndServe(":"+*hostPort, nil)
 	if err != nil {
 		fmt.Println("Error when serving:", err)
-		return
+		os.Exit(1)
 	}
 	fmt.Println("Done serving")
 }
