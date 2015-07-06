@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -60,4 +61,10 @@ func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.Bloc
 	err = json.Unmarshal(blockSumJson, &blockSummaries)
 
 	return blockSummaries, err
+}
+
+// apiGetHash queries siad and returns the raw data. The json data can
+// be decoded based on the ResponseType field
+func (es *ExploreServer) apiGetHash(hash []byte) ([]byte, error) {
+	return es.apiGet(fmt.Sprintf("/blockexplorer/gethash?hash=%x", hash))
 }

@@ -5,7 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
+
+	"github.com/NebulousLabs/Sia/types"
 )
 
 // A structure to store any state of the server. Should remain
@@ -27,38 +30,60 @@ func writeJSON(w http.ResponseWriter, obj interface{}) {
 	}
 }
 
-func (srv *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
+// overviewPage handles the default request, which displays a summary
+// of the blockchain
+func (es *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 	// First query the local instance of siad for the status
-	explorerState, err := srv.apiExplorerState()
+	explorerState, err := es.apiExplorerState()
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	blocklist, err := srv.apiGetBlockData(0, explorerState.Height)
+	blocklist, err := es.apiGetBlockData(0, explorerState.Height)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	// Attempt to make a page out of it
-	page, err := parseOverview(overviewRoot{
+	page, err := es.parseTemplate("overview.html", overviewRoot{
 		Explorer:       explorerState,
 		BlockSummaries: blocklist,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Write(page)
 }
 
-// Handles the root page being requested. Is responsible for
+// heightHandler handles the request to get a block by block height by
+// redirecting the request to the relevant block ID
+func (es *ExploreServer) heightHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract the height
+	var height types.BlockHeight
+	_, err := fmt.Sscanf(r.FormValue("h"), "%d", &height)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Request info on that height
+	blockSummaries, err := es.apiGetBlockData(height, height+1)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("hash?h=%x", blockSummaries[0].ID), 301)
+}
+
+// rootHandler handles the root page being requested. Is responsible for
 // differentiating between api calls and pages
-func (srv *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
+func (es *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(r.URL.Path, ".") {
-		srv.serveMux.ServeHTTP(w, r)
+		es.serveMux.ServeHTTP(w, r)
 	} else {
-		srv.overviewPage(w, r)
+		es.overviewPage(w, r)
 	}
 }
 
@@ -69,13 +94,19 @@ func main() {
 	flag.Parse()
 
 	// Initilize the server
-	var srv = &ExploreServer{
+	var es = &ExploreServer{
 		url:      "http://localhost:" + *apiPort,
 		serveMux: http.NewServeMux(),
 	}
 
-	srv.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
-	http.HandleFunc("/", srv.rootHandler)
-	http.ListenAndServe(":"+*hostPort, nil)
+	es.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
+	http.HandleFunc("/", es.rootHandler)
+	http.HandleFunc("/hash", es.hashPageHandler)
+	http.HandleFunc("/height", es.heightHandler)
+	err := http.ListenAndServe(":"+*hostPort, nil)
+	if err != nil {
+		fmt.Println("Error when serving: " + err.Error())
+		os.Exit(1)
+	}
 	fmt.Println("Done serving")
 }
