@@ -22,10 +22,10 @@ func rateString(rate uint64) string {
 	return fmt.Sprintf("%f %s", r, postfixes[i])
 }
 
-// The hashrate function takes in a slice of block data, each with a
-// timestamp and a target, and returns an estimated number of hashes
-// that were done per second
-func hashrate(blockSummaries []modules.ExplorerBlockData) (rate uint64) {
+// The hashrate function takes in a slice of block data, each with a timestamp
+// and a target, and returns an estimated number of hashes that were done per
+// second
+func hashrate(blockSummaries []modules.ExplorerBlockData) uint64 {
 	if len(blockSummaries) <= 0 {
 		return 0
 	}
@@ -42,6 +42,5 @@ func hashrate(blockSummaries []modules.ExplorerBlockData) (rate uint64) {
 	}
 
 	hashes := new(big.Int).Div(types.RootDepth.Int(), sum.Int())
-	rate = uint64(new(big.Int).Div(hashes, big.NewInt(int64(totaltime))).Int64())
-	return
+	return uint64(new(big.Int).Div(hashes, big.NewInt(int64(totaltime))).Int64())
 }

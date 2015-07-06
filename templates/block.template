@@ -26,7 +26,7 @@
 	<td>{{byteString .Size}}</td>
       </tr>
       <tr>
-	<td>Transcations</td>
+	<td>Transactions</td>
 	<td>
 	  <ul>
 	    {{range .Block.Transactions}}

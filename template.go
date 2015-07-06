@@ -49,8 +49,8 @@ type (
 var coinPostfixes []string = []string{"SC", "KS", "MS", "GS", "TS", "PS"}
 var bytePostfixes []string = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
-// siacoinString, byteString, and timeString, are used for formatting
-// numbers in a human readable way inside the template
+// siacoinString, byteString, and timeString, are used for formatting numbers
+// in a human readable way inside the template
 func siacoinString(siacoins types.Currency) string {
 	coins := float64(siacoins.Div(types.SiacoinPrecision).Big().Int64())
 
@@ -82,20 +82,19 @@ func timeString(epoch types.Timestamp) string {
 }
 
 // hashAvgString is a wrapper for the hashrate function, found in hashrate.go
-func hashAvgString(numBlocks types.BlockHeight, o overviewRoot) (s string) {
+func hashAvgString(numBlocks types.BlockHeight, o overviewRoot) string {
 	if int(numBlocks) >= len(o.BlockSummaries) {
 		return rateString(hashrate(o.BlockSummaries))
 	}
-	s = rateString(hashrate(o.BlockSummaries[o.Explorer.Height-numBlocks : o.Explorer.Height]))
-	return
+	return rateString(hashrate(o.BlockSummaries[o.Explorer.Height-numBlocks : o.Explorer.Height]))
 }
 
-// parseTemplate is a more generic funciton to parse a template given
+// parseTemplate is a more generic function to parse a template given
 // just a template filename and an object to be put into the template,
 func (es *ExploreServer) parseTemplate(templateName string, data interface{}) ([]byte, error) {
 
 	// funcMap is passed to the template engine so that templates may have
-	// access to these funcitons. Defined here to give acess to functions of es.
+	// access to these functions. Defined here to give access to functions of es.
 	var funcMap = template.FuncMap{
 		"siacoinString":    siacoinString,
 		"byteString":       byteString,
@@ -108,7 +107,7 @@ func (es *ExploreServer) parseTemplate(templateName string, data interface{}) ([
 
 	t, err := template.New(templateName).Funcs(funcMap).ParseFiles("templates/" + templateName)
 	if err != nil {
-		s := fmt.Sprintf("Error parsing template %s : %s", templateName, err.Error())
+		s := fmt.Sprintf("Error parsing template %s: %v", templateName, err)
 		fmt.Println(s)
 		return nil, errors.New(s)
 	}
@@ -118,11 +117,10 @@ func (es *ExploreServer) parseTemplate(templateName string, data interface{}) ([
 	var doc bytes.Buffer
 	err = t.Execute(&doc, data)
 	if err != nil {
-		s := fmt.Sprintf("Error executing template %s: %s", templateName, err.Error())
+		s := fmt.Sprintf("Error executing template %s: %v", templateName, err)
 		fmt.Println(s)
 		return nil, errors.New(s)
 	}
 
-	s := doc.Bytes()
-	return s, nil
+	return doc.Bytes(), nil
 }

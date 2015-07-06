@@ -10,10 +10,10 @@ import (
 	"github.com/NebulousLabs/Sia/types"
 )
 
-// Redefine the structs sent by the blockexplorer here. As they are
-// sent through the modules module and the api as an interface{}, they
-// are only defined in the blockexplorer module of Sia, which should
-// not be imported from an external program
+// Redefine the structs sent by the blockexplorer here. As they are sent
+// through the modules module and the API as an interface{}, they are only
+// defined in the blockexplorer module of Sia, which should not be imported
+// from an external program
 type (
 	responseData struct {
 		ResponseType string
@@ -35,8 +35,8 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Now decode the json and figure out which display function
-	// to dispatch it to.
+	// Now decode the JSON and figure out which display function to dispatch
+	// it to.
 	var rd responseData
 	err = json.Unmarshal(itemJSON, &rd)
 	if err != nil {
@@ -56,7 +56,7 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 	case "FileContract":
 		es.contractPage(w, itemJSON, hash)
 	default:
-		http.Error(w, "Siad returned: "+string(itemJSON), 500)
+		http.Error(w, "siad returned: "+string(itemJSON), 500)
 	}
 }
 
@@ -65,8 +65,8 @@ func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
 	if hash == (crypto.Hash{}) {
 		return nil, nil
 	}
-	// Decode into a responseData struct to figure out
-	// what type of response it is, then switch on it
+	// Decode into a responseData struct to figure out what type of response
+	// it is, then switch on it
 	itemJSON, err := es.apiGetHash(hash[:])
 	if err != nil {
 		return nil, err
@@ -86,23 +86,19 @@ func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
 			return nil, err
 		}
 
-		// The block page requires additional
-		// information contained in the block summary
+		// The block page requires additional information contained in the
+		// block summary
 		blockSummaries, err := es.apiGetBlockData(b.Height, b.Height+1)
 		if err != nil {
 			return nil, err
 		}
 
-		parsed, err := es.parseTemplate("block.template", blockRoot{
+		return es.parseTemplate("block.template", blockRoot{
 			Block:  b.Block,
 			Height: b.Height,
 			Target: blockSummaries[0].Target,
 			Size:   blockSummaries[0].Size,
 		})
-		if err != nil {
-			return nil, err
-		}
-		return parsed, nil
 	case "Transaction":
 		var t modules.TransactionResponse
 		err := json.Unmarshal(itemJSON, &t)
@@ -110,17 +106,13 @@ func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
 			return nil, err
 		}
 		// Parse the main transaction template
-		parsed, err := es.parseTemplate("transaction.template", t)
-		if err != nil {
-			return nil, err
-		}
-		return parsed, nil
+		return es.parseTemplate("transaction.template", t)
 	}
 	return nil, nil
 }
 
-// parseTransactions iterates over a list of transactions and puts
-// each one into an html template, returning the concatinated list
+// parseTransactions iterates over a list of transactions and puts each one
+// into an HTML template, returning the concatenated list
 func (es *ExploreServer) parseTransactions(hashes []crypto.Hash) ([]byte, error) {
 	var page []byte
 
@@ -164,8 +156,8 @@ func (es *ExploreServer) blockPage(w http.ResponseWriter, blockJSON []byte) {
 	w.Write(page)
 }
 
-// txPage formats information about a transaction in a format suitable
-// for human viewing
+// txPage formats information about a transaction in a format suitable for
+// human viewing
 func (es *ExploreServer) txPage(w http.ResponseWriter, txJSON []byte) {
 	var t modules.TransactionResponse
 	err := json.Unmarshal(txJSON, &t)
@@ -208,8 +200,8 @@ func (es *ExploreServer) outputPage(w http.ResponseWriter, outJSON []byte, oID [
 	w.Write(page)
 }
 
-// addressPage formats the list of transactions that an address
-// participated in for human consumption
+// addressPage formats the list of transactions that an address participated
+// in for human consumption
 func (es *ExploreServer) addressPage(w http.ResponseWriter, addrJSON []byte, address []byte) {
 	var ad modules.AddrResponse
 	err := json.Unmarshal(addrJSON, &ad)
