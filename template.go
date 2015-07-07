@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math/big"
 	"text/template"
 	"time"
 
@@ -46,21 +47,36 @@ type (
 )
 
 // Used in siacoinString and byteString
-var coinPostfixes []string = []string{"SC", "KS", "MS", "GS", "TS", "PS"}
+var coinPostfixes []string = []string{"yS", "zS", "aS", "fS", "pS", "nS", "\u03bcS", "mS", "SC", "KS", "MS", "GS", "TS", "PS"}
 var bytePostfixes []string = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
 // siacoinString, byteString, and timeString, are used for formatting numbers
 // in a human readable way inside the template
 func siacoinString(siacoins types.Currency) string {
-	coins := float64(siacoins.Div(types.SiacoinPrecision).Big().Int64())
+	if siacoins.Cmp(types.NewCurrency64(0)) == 0 {
+		return "0 SC"
+	}
 
-	var i int = 0
-	for coins > 1000 {
-		coins = coins / 1000
+	coins := big.NewRat(0, 1).SetFrac(siacoins.Big(), types.SiacoinPrecision.Big())
+
+	var i int = 8
+	for coins.Cmp(big.NewRat(1000, 1)) > 0 {
+		coins.Mul(coins, big.NewRat(1, 1000))
 		i++
 	}
 
-	return fmt.Sprintf("%f %s", coins, coinPostfixes[i])
+	for coins.Cmp(big.NewRat(1, 1)) < 0 {
+		coins.Mul(coins, big.NewRat(1000, 1))
+		i--
+	}
+
+	if i < 0 {
+		return fmt.Sprintf("%s H", siacoins)
+	}
+	// Second argument is exactness, which will get cut off upon
+	// printing
+	f, _ := coins.Float64()
+	return fmt.Sprintf("%f %s", f, coinPostfixes[i])
 }
 
 func byteString(numBytes uint64) string {
