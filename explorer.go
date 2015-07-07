@@ -11,27 +11,23 @@ import (
 	"github.com/NebulousLabs/Sia/types"
 )
 
-// A structure to store any state of the server. Should remain
-// relatively unpopulated, mostly constants which will eventually be
-// broken off
+// A structure to store any state of the server. Should remain relatively
+// unpopulated, mostly constants which will eventually be broken off
 type ExploreServer struct {
-	// The explorer must know where to send the API calls
-	url string
-
-	// Used to store the server muxer
+	url      string
 	serveMux *http.ServeMux
 }
 
-// writeJSON writes the object to the ResponseWriter. If the encoding fails, an
-// error is written instead.
+// writeJSON writes the object to the ResponseWriter. If the encoding fails,
+// an error is written instead.
 func writeJSON(w http.ResponseWriter, obj interface{}) {
 	if json.NewEncoder(w).Encode(obj) != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 }
 
-// overviewPage handles the default request, which displays a summary
-// of the blockchain
+// overviewPage handles the default request, which displays a summary of the
+// blockchain
 func (es *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 	// First query the local instance of siad for the status
 	explorerState, err := es.apiExplorerState()
@@ -78,7 +74,7 @@ func (es *ExploreServer) heightHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // rootHandler handles the root page being requested. Is responsible for
-// differentiating between api calls and pages
+// differentiating between API calls and pages
 func (es *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(r.URL.Path, ".") {
 		es.serveMux.ServeHTTP(w, r)
@@ -89,11 +85,11 @@ func (es *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// Parse command line flags for port numbers
-	apiPort := flag.String("a", "9980", "Api port")
+	apiPort := flag.String("a", "9980", "API port")
 	hostPort := flag.String("p", "9983", "HTTP host port")
 	flag.Parse()
 
-	// Initilize the server
+	// Initialize the server
 	var es = &ExploreServer{
 		url:      "http://localhost:" + *apiPort,
 		serveMux: http.NewServeMux(),
@@ -105,7 +101,7 @@ func main() {
 	http.HandleFunc("/height", es.heightHandler)
 	err := http.ListenAndServe(":"+*hostPort, nil)
 	if err != nil {
-		fmt.Println("Error when serving: " + err.Error())
+		fmt.Println("Error when serving:", err)
 		os.Exit(1)
 	}
 	fmt.Println("Done serving")

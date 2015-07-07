@@ -15,10 +15,9 @@ import (
 
 // Does an arbitrary request to the server referenced by link, returns as a byte array.
 func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
-	// Do a http request to the sia daemon
+	// Do a HTTP request to the Sia daemon
 	resp, err := http.Get(es.url + apiCall)
 	if err != nil {
-		// err is already set
 		return
 	}
 
@@ -33,7 +32,7 @@ func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 	return
 }
 
-// ExplorerState queries the locally running statu
+// ExplorerState queries the locally running status.
 func (es *ExploreServer) apiExplorerState() (explorerStatus modules.ExplorerStatus, err error) {
 	stateJSON, err := es.apiGet("/blockexplorer/status")
 	if err != nil {
@@ -41,7 +40,6 @@ func (es *ExploreServer) apiExplorerState() (explorerStatus modules.ExplorerStat
 	}
 
 	err = json.Unmarshal(stateJSON, &explorerStatus)
-
 	return
 }
 
@@ -56,14 +54,11 @@ func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.Bloc
 	}
 
 	var blockSummaries []modules.ExplorerBlockData
-
-	// Attepmt to interpret as a block
 	err = json.Unmarshal(blockSumJson, &blockSummaries)
-
 	return blockSummaries, err
 }
 
-// apiGetHash queries siad and returns the raw data. The json data can
+// apiGetHash queries siad and returns the raw data. The JSON data can
 // be decoded based on the ResponseType field
 func (es *ExploreServer) apiGetHash(hash []byte) ([]byte, error) {
 	return es.apiGet(fmt.Sprintf("/blockexplorer/gethash?hash=%x", hash))
