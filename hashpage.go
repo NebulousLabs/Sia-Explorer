@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -245,4 +246,99 @@ func (es *ExploreServer) contractPage(w http.ResponseWriter, fcJSON []byte, fcid
 		return
 	}
 	w.Write(page)
+}
+
+// findOutput scans a transaction/bolck and returns the output
+func (es *ExploreServer) findOutput(oID types.SiacoinOutputID) (types.SiacoinOutput, error) {
+	// First do a lookup on the txid
+	itemJSON, err := es.apiGetHash(oID[:])
+	if err != nil {
+		return types.SiacoinOutput{}, err
+	}
+
+	var or modules.OutputResponse
+	err = json.Unmarshal(itemJSON, &or)
+	if err != nil {
+		return types.SiacoinOutput{}, err
+	}
+
+	// Will have to switch on the type, as it colud be a block
+	itemJSON, err = es.apiGetHash(or.OutputTx[:])
+	if err != nil {
+		return types.SiacoinOutput{}, err
+	}
+
+	var rd responseData
+	err = json.Unmarshal(itemJSON, &rd)
+	if err != nil {
+		return types.SiacoinOutput{}, err
+	}
+
+	switch rd.ResponseType {
+	case "Block":
+		var b modules.BlockResponse
+		err := json.Unmarshal(itemJSON, &b)
+		if err != nil {
+			return types.SiacoinOutput{}, nil
+		}
+
+		return findOutputBlock(oID, b.Block)
+	case "Transaction":
+		var tr modules.TransactionResponse
+		err := json.Unmarshal(itemJSON, &tr)
+		if err != nil {
+			return types.SiacoinOutput{}, nil
+		}
+
+		return findOutputTransaction(oID, tr.Tx)
+	}
+	return types.SiacoinOutput{}, nil
+}
+
+// findOutputBlock scans through all outputs in a block to find one
+// with a given ID
+func findOutputBlock(oID types.SiacoinOutputID, b types.Block) (types.SiacoinOutput, error) {
+	for i, output := range b.MinerPayouts {
+		if oID == b.MinerPayoutID(i) {
+			return output, nil
+		}
+	}
+	return types.SiacoinOutput{}, errors.New("output not found in block")
+}
+
+// findOutputTransactions scans through all otuputs in a transaction
+// to find the one with a given ID
+func findOutputTransaction(oID types.SiacoinOutputID, tx types.Transaction) (types.SiacoinOutput, error) {
+	for i, output := range tx.SiacoinOutputs {
+		if oID == tx.SiacoinOutputID(i) {
+			return output, nil
+		}
+	}
+	for i, fc := range tx.FileContracts {
+		fcid := tx.FileContractID(i)
+		for j, output := range fc.ValidProofOutputs {
+			if oID == fcid.StorageProofOutputID(true, j) {
+				return output, nil
+			}
+		}
+		for j, output := range fc.MissedProofOutputs {
+			if oID == fcid.StorageProofOutputID(false, j) {
+				return output, nil
+			}
+		}
+	}
+	for _, revision := range tx.FileContractRevisions {
+		fcid := revision.ParentID
+		for j, output := range revision.NewValidProofOutputs {
+			if oID == fcid.StorageProofOutputID(true, j) {
+				return output, nil
+			}
+		}
+		for j, output := range revision.NewMissedProofOutputs {
+			if oID == fcid.StorageProofOutputID(false, j) {
+				return output, nil
+			}
+		}
+	}
+	return types.SiacoinOutput{}, errors.New("output not found in transaction")
 }

@@ -118,6 +118,7 @@ func (es *ExploreServer) parseTemplate(templateName string, data interface{}) ([
 		"timeString":       timeString,
 		"parseTemplate":    es.parseTemplate,
 		"parseTransaction": es.parseTransaction,
+		"findOutput":       es.findOutput,
 		"increment":        func(x types.BlockHeight) types.BlockHeight { return x + 1 },
 	}
 
