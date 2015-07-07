@@ -18,6 +18,7 @@ type (
 	overviewRoot struct {
 		Explorer       modules.ExplorerStatus
 		BlockSummaries []modules.ExplorerBlockData
+		NodeVersion    string
 	}
 
 	blockRoot struct {

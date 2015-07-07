@@ -40,10 +40,24 @@ func (es *ExploreServer) overviewPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	nv, err := es.apiGet("/daemon/version")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var nvs string
+	err = json.Unmarshal(nv, &nvs)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	// Attempt to make a page out of it
 	page, err := es.parseTemplate("overview.html", overviewRoot{
 		Explorer:       explorerState,
 		BlockSummaries: blocklist,
+		NodeVersion:    nvs,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
