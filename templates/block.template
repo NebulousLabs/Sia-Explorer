@@ -22,6 +22,10 @@
 	<td>{{printf "%x" .Target}}</td>
       </tr>
       <tr>
+	<td>Approximate Hashes</td>
+	<td>{{.Hashes}}</td>
+      </tr>
+      <tr>
 	<td>Block Size</td>
 	<td>{{byteString .Size}}</td>
       </tr>

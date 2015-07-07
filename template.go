@@ -25,6 +25,7 @@ type (
 		Block  types.Block
 		Height types.BlockHeight
 		Target types.Target
+		Hashes uint64
 		Size   uint64
 	}
 

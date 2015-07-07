@@ -99,6 +99,7 @@ func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
 			Height: b.Height,
 			Target: blockSummaries[0].Target,
 			Size:   blockSummaries[0].Size,
+			Hashes: uint64(expectedHashes(blockSummaries[0].Target)),
 		})
 	case "Transaction":
 		var t modules.TransactionResponse
@@ -149,6 +150,7 @@ func (es *ExploreServer) blockPage(w http.ResponseWriter, blockJSON []byte) {
 		Height: b.Height,
 		Target: blockSummaries[0].Target,
 		Size:   blockSummaries[0].Size,
+		Hashes: uint64(expectedHashes(blockSummaries[0].Target)),
 	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)

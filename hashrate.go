@@ -44,3 +44,9 @@ func hashrate(blockSummaries []modules.ExplorerBlockData) uint64 {
 	hashes := new(big.Int).Div(types.RootDepth.Int(), sum.Int())
 	return uint64(new(big.Int).Div(hashes, big.NewInt(int64(totaltime))).Int64())
 }
+
+// Calculates the expected number of hashes from a given target
+func expectedHashes(t types.Target) int64 {
+	rd := types.RootDepth.Int()
+	return rd.Div(rd, t.Int()).Int64()
+}
