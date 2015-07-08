@@ -99,7 +99,7 @@ func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
 			Height: b.Height,
 			Target: blockSummaries[0].Target,
 			Size:   blockSummaries[0].Size,
-			Hashes: uint64(expectedHashes(blockSummaries[0].Target)),
+			Hashes: expectedHashes(blockSummaries[0].Target),
 		})
 	case "Transaction":
 		var t modules.TransactionResponse
@@ -150,7 +150,7 @@ func (es *ExploreServer) blockPage(w http.ResponseWriter, blockJSON []byte) {
 		Height: b.Height,
 		Target: blockSummaries[0].Target,
 		Size:   blockSummaries[0].Size,
-		Hashes: uint64(expectedHashes(blockSummaries[0].Target)),
+		Hashes: expectedHashes(blockSummaries[0].Target),
 	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -251,50 +251,50 @@ func (es *ExploreServer) contractPage(w http.ResponseWriter, fcJSON []byte, fcid
 }
 
 // findOutput scans a transaction/bolck and returns the output
-func (es *ExploreServer) findOutput(oID types.SiacoinOutputID) (types.SiacoinOutput, error) {
+func (es *ExploreServer) findOutput(oID types.SiacoinOutputID) (sco types.SiacoinOutput, err error) {
 	// First do a lookup on the txid
 	itemJSON, err := es.apiGetHash(oID[:])
 	if err != nil {
-		return types.SiacoinOutput{}, err
+		return
 	}
 
 	var or modules.OutputResponse
 	err = json.Unmarshal(itemJSON, &or)
 	if err != nil {
-		return types.SiacoinOutput{}, err
+		return
 	}
 
 	// Will have to switch on the type, as it colud be a block
 	itemJSON, err = es.apiGetHash(or.OutputTx[:])
 	if err != nil {
-		return types.SiacoinOutput{}, err
+		return
 	}
 
 	var rd responseData
 	err = json.Unmarshal(itemJSON, &rd)
 	if err != nil {
-		return types.SiacoinOutput{}, err
+		return
 	}
 
 	switch rd.ResponseType {
 	case "Block":
 		var b modules.BlockResponse
-		err := json.Unmarshal(itemJSON, &b)
+		err = json.Unmarshal(itemJSON, &b)
 		if err != nil {
-			return types.SiacoinOutput{}, nil
+			return
 		}
 
 		return findOutputBlock(oID, b.Block)
 	case "Transaction":
 		var tr modules.TransactionResponse
-		err := json.Unmarshal(itemJSON, &tr)
+		err = json.Unmarshal(itemJSON, &tr)
 		if err != nil {
-			return types.SiacoinOutput{}, nil
+			return
 		}
 
 		return findOutputTransaction(oID, tr.Tx)
 	}
-	return types.SiacoinOutput{}, nil
+	return
 }
 
 // findOutputBlock scans through all outputs in a block to find one
