@@ -12,11 +12,20 @@
       <tr>
 	<td>Siacoin Inputs</td>
 	<td>
-	  <ul>
+	  <table>
+	    <tr>
+	      <td>Output ID</td>
+	      <td>Amount</td>
+	      <td>Address</td>
+	    </tr>
 	    {{range .Tx.SiacoinInputs}}
-	    <li><a href='hash?h={{printf "%x" .ParentID}}'>{{printf "%x" .ParentID}}</a></li>
+	    {{$output := findOutput .ParentID}}
+	    <tr>
+	      <td><a href='hash?h={{printf "%x" .ParentID}}'>{{printf "%x" .ParentID}}</a></td>
+	      <td>{{siacoinString $output.Value}}</td>
+	      <td><a href='hash?h={{$output.UnlockHash.String}}'>{{$output.UnlockHash.String}}</a></td>
 	    {{end}}
-	  </ul>
+	  </table>
 	</td>
       </tr>
       <tr>

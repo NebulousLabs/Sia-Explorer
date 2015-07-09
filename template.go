@@ -17,12 +17,14 @@ type (
 	overviewRoot struct {
 		Explorer       modules.ExplorerStatus
 		BlockSummaries []modules.ExplorerBlockData
+		NodeVersion    string
 	}
 
 	blockRoot struct {
 		Block  types.Block
 		Height types.BlockHeight
 		Target types.Target
+		Hashes uint64
 		Size   uint64
 	}
 
@@ -46,21 +48,27 @@ type (
 )
 
 // Used in siacoinString and byteString
-var coinPostfixes []string = []string{"SC", "KS", "MS", "GS", "TS", "PS"}
+var coinPostfixes []string = []string{"H", "zS", "aS", "fS", "pS", "nS", "µS", "mS", "SC", "KS", "MS", "GS", "TS", "PS"}
 var bytePostfixes []string = []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
 // siacoinString, byteString, and timeString, are used for formatting numbers
 // in a human readable way inside the template
 func siacoinString(siacoins types.Currency) string {
-	coins := float64(siacoins.Div(types.SiacoinPrecision).Big().Int64())
-
-	var i int = 0
-	for coins > 1000 {
-		coins = coins / 1000
-		i++
+	if siacoins.Cmp(types.NewCurrency64(0)) == 0 {
+		return "0 SC"
 	}
 
-	return fmt.Sprintf("%f %s", coins, coinPostfixes[i])
+	coinStr := siacoins.String()
+
+	unitIndex := (len(coinStr) - 1) / 3
+
+	if unitIndex >= len(coinPostfixes) {
+		unitIndex = len(coinPostfixes) - 1
+	}
+
+	decPoint := len(coinStr) - (unitIndex * 3)
+
+	return fmt.Sprintf("%s.%s %s", coinStr[:decPoint], coinStr[decPoint:decPoint+6], coinPostfixes[unitIndex])
 }
 
 func byteString(numBytes uint64) string {
@@ -102,6 +110,7 @@ func (es *ExploreServer) parseTemplate(templateName string, data interface{}) ([
 		"timeString":       timeString,
 		"parseTemplate":    es.parseTemplate,
 		"parseTransaction": es.parseTransaction,
+		"findOutput":       es.findOutput,
 		"increment":        func(x types.BlockHeight) types.BlockHeight { return x + 1 },
 	}
 
