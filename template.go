@@ -68,7 +68,12 @@ func siacoinString(siacoins types.Currency) string {
 
 	decPoint := len(coinStr) - (unitIndex * 3)
 
-	return fmt.Sprintf("%s.%s %s", coinStr[:decPoint], coinStr[decPoint:decPoint+6], coinPostfixes[unitIndex])
+	postStr := coinStr[decPoint:]
+	if len(postStr) > 6 {
+		postStr = postStr[:6]
+	}
+
+	return fmt.Sprintf("%s.%s %s", coinStr[:decPoint], postStr, coinPostfixes[unitIndex])
 }
 
 func byteString(numBytes uint64) string {
