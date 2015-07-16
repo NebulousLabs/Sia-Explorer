@@ -301,7 +301,7 @@ func (es *ExploreServer) findOutput(oID types.SiacoinOutputID) (sco types.Siacoi
 // with a given ID
 func findOutputBlock(oID types.SiacoinOutputID, b types.Block) (types.SiacoinOutput, error) {
 	for i, output := range b.MinerPayouts {
-		if oID == b.MinerPayoutID(i) {
+		if oID == b.MinerPayoutID(uint64(i)) {
 			return output, nil
 		}
 	}
@@ -319,12 +319,12 @@ func findOutputTransaction(oID types.SiacoinOutputID, tx types.Transaction) (typ
 	for i, fc := range tx.FileContracts {
 		fcid := tx.FileContractID(i)
 		for j, output := range fc.ValidProofOutputs {
-			if oID == fcid.StorageProofOutputID(true, j) {
+			if oID == fcid.StorageProofOutputID(true, uint64(j)) {
 				return output, nil
 			}
 		}
 		for j, output := range fc.MissedProofOutputs {
-			if oID == fcid.StorageProofOutputID(false, j) {
+			if oID == fcid.StorageProofOutputID(false, uint64(j)) {
 				return output, nil
 			}
 		}
@@ -332,12 +332,12 @@ func findOutputTransaction(oID types.SiacoinOutputID, tx types.Transaction) (typ
 	for _, revision := range tx.FileContractRevisions {
 		fcid := revision.ParentID
 		for j, output := range revision.NewValidProofOutputs {
-			if oID == fcid.StorageProofOutputID(true, j) {
+			if oID == fcid.StorageProofOutputID(true, uint64(j)) {
 				return output, nil
 			}
 		}
 		for j, output := range revision.NewMissedProofOutputs {
-			if oID == fcid.StorageProofOutputID(false, j) {
+			if oID == fcid.StorageProofOutputID(false, uint64(j)) {
 				return output, nil
 			}
 		}
