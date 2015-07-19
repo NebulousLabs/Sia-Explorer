@@ -34,7 +34,7 @@ func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 
 // ExplorerState queries the locally running status.
 func (es *ExploreServer) apiExplorerState() (explorerStatus modules.ExplorerStatus, err error) {
-	stateJSON, err := es.apiGet("/blockexplorer/status")
+	stateJSON, err := es.apiGet("/explorer/status")
 	if err != nil {
 		return
 	}
@@ -48,7 +48,7 @@ func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.Bloc
 	v := url.Values{}
 	v.Set("start", strconv.Itoa(int(start)))
 	v.Add("finish", strconv.Itoa(int(end)))
-	blockSumJson, err := es.apiGet("/blockexplorer/blockdata?" + v.Encode())
+	blockSumJson, err := es.apiGet("/explorer/blockdata?" + v.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -61,5 +61,5 @@ func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.Bloc
 // apiGetHash queries siad and returns the raw data. The JSON data can
 // be decoded based on the ResponseType field
 func (es *ExploreServer) apiGetHash(hash []byte) ([]byte, error) {
-	return es.apiGet(fmt.Sprintf("/blockexplorer/gethash?hash=%x", hash))
+	return es.apiGet(fmt.Sprintf("/explorer/gethash?hash=%x", hash))
 }
