@@ -51,8 +51,8 @@
 	    {{range $index, $element := .Block.MinerPayouts}}
 	    <tr>
 	      <td>
-		<a href='hash?h={{$index | $root.Block.MinerPayoutID | printf "%x"}}'>
-		  {{$index | $root.Block.MinerPayoutID | printf "%x"}}
+		<a href='hash?h={{$index | uint64 | $root.Block.MinerPayoutID | printf "%x"}}'>
+		  {{$index | uint64 | $root.Block.MinerPayoutID | printf "%x"}}
 		</a>
 	      </td>
 	      <td>{{siacoinString $element.Value}}</td>
