@@ -79,8 +79,8 @@
 	    {{$fcid := $root.Tx.FileContractID $FCindex}}
 	    <tr>
 	      <td>
-		<a href='hash?h={{$fcid.StorageProofOutputID true $FCindex | printf "%x"}}'>
-		  {{$fcid.StorageProofOutputID true $FCindex | printf "%x"}}
+		<a href='hash?h={{$FCindex | uint64 | $fcid.StorageProofOutputID true | printf "%x"}}'>
+		  {{$FCindex | uint64 | $fcid.StorageProofOutputID true | printf "%x"}}
 		</a>
 	      </td>
 	      <td>{{siacoinString $FCelement.Value}}</td>
