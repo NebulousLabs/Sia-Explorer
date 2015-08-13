@@ -113,6 +113,7 @@ func main() {
 	http.HandleFunc("/", es.rootHandler)
 	http.HandleFunc("/hash", es.hashPageHandler)
 	http.HandleFunc("/height", es.heightHandler)
+	http.HandleFunc("/hosts", es.hostsHandler)
 	err := http.ListenAndServe(":"+*hostPort, nil)
 	if err != nil {
 		fmt.Println("Error when serving:", err)
