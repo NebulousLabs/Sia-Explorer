@@ -29,20 +29,20 @@ type (
 	}
 
 	outputRoot struct {
-		OutputTx crypto.Hash
-		InputTx  crypto.Hash
+		OutputTx types.TransactionID
+		InputTx  types.TransactionID
 		OutputID crypto.Hash
 	}
 
 	filecontractRoot struct {
-		Contract  crypto.Hash
-		Revisions []crypto.Hash
-		Proof     crypto.Hash
+		Contract  types.TransactionID
+		Revisions []types.TransactionID
+		Proof     types.TransactionID
 		FcID      types.FileContractID
 	}
 
 	addressRoot struct {
-		Txns []crypto.Hash
+		Txns []types.TransactionID
 		Addr []byte
 	}
 )
