@@ -118,6 +118,7 @@ func (es *ExploreServer) parseTemplate(templateName string, data interface{}) ([
 		"findOutput":       es.findOutput,
 		"increment":        func(x types.BlockHeight) types.BlockHeight { return x + 1 },
 		"uint64":           func(x int) uint64 { return uint64(x) },
+		"int64_uint64":     func(x int64) uint64 { return uint64(x) },
 	}
 
 	t, err := template.New(templateName).Funcs(funcMap).ParseFiles("templates/" + templateName)

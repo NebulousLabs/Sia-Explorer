@@ -17,7 +17,7 @@ type hostList struct {
 // information about the hosts network and database
 func (es *ExploreServer) hostsHandler(w http.ResponseWriter, r *http.Request) {
 	// Query the host host database for all hosts
-	hlb, err := es.apiGet("/hostdb/hosts/all")
+	hlb, err := es.apiGet("/hostdb/hosts/active")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
