@@ -29,20 +29,20 @@ type (
 	}
 
 	outputRoot struct {
-		OutputTx crypto.Hash
-		InputTx  crypto.Hash
+		OutputTx types.TransactionID
+		InputTx  types.TransactionID
 		OutputID crypto.Hash
 	}
 
 	filecontractRoot struct {
-		Contract  crypto.Hash
-		Revisions []crypto.Hash
-		Proof     crypto.Hash
+		Contract  types.TransactionID
+		Revisions []types.TransactionID
+		Proof     types.TransactionID
 		FcID      types.FileContractID
 	}
 
 	addressRoot struct {
-		Txns []crypto.Hash
+		Txns []types.TransactionID
 		Addr []byte
 	}
 )
@@ -118,6 +118,7 @@ func (es *ExploreServer) parseTemplate(templateName string, data interface{}) ([
 		"findOutput":       es.findOutput,
 		"increment":        func(x types.BlockHeight) types.BlockHeight { return x + 1 },
 		"uint64":           func(x int) uint64 { return uint64(x) },
+		"int64_uint64":     func(x int64) uint64 { return uint64(x) },
 	}
 
 	t, err := template.New(templateName).Funcs(funcMap).ParseFiles("templates/" + templateName)
