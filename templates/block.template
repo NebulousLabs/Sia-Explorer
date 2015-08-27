@@ -3,11 +3,11 @@
     <table>
       <tr>
 	<td>Block ID</td>
-	<td>{{printf "%x" .Block.ID}}</td>
+	<td>{{printf "%s" .Block.ID}}</td>
       </tr>
       <tr>
 	<td>Block Parent ID</td>
-	<td><a href='hash?h={{printf "%x" .Block.ParentID}}'>{{printf "%x" .Block.ParentID}}</a></td>
+	<td><a href='hash?h={{printf "%s" .Block.ParentID}}'>{{printf "%s" .Block.ParentID}}</a></td>
       </tr>
       <tr>
 	<td>Child</td>
@@ -34,7 +34,7 @@
 	<td>
 	  <ul>
 	    {{range .Block.Transactions}}
-	    <li><a href='hash?h={{printf "%x" .ID}}'>{{printf "%x" .ID}}</a></li>
+	    <li><a href='hash?h={{printf "%s" .ID}}'>{{printf "%s" .ID}}</a></li>
 	    {{end}}
 	  </ul>
 	</td>
@@ -51,8 +51,8 @@
 	    {{range $index, $element := .Block.MinerPayouts}}
 	    <tr>
 	      <td>
-		<a href='hash?h={{$index | uint64 | $root.Block.MinerPayoutID | printf "%x"}}'>
-		  {{$index | uint64 | $root.Block.MinerPayoutID | printf "%x"}}
+		<a href='hash?h={{$index | uint64 | $root.Block.MinerPayoutID | printf "%s"}}'>
+		  {{$index | uint64 | $root.Block.MinerPayoutID | printf "%s"}}
 		</a>
 	      </td>
 	      <td>{{siacoinString $element.Value}}</td>
