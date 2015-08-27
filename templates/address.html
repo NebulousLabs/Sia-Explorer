@@ -1,5 +1,5 @@
 {{printf "Address %x" .Addr |  parseTemplate "header.template" | printf "%s"}}
 {{range .Txns}}
-{{parseTransaction . | printf "%s"}}
+{{txidToHash . | parseTransaction | printf "%s"}}
 {{end}}
 {{printf "Address %x" .Addr |  parseTemplate "footer.template" | printf "%s"}}
