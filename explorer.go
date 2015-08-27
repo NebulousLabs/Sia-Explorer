@@ -84,7 +84,7 @@ func (es *ExploreServer) heightHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("hash?h=%x", blockSummaries[0].ID), 301)
+	http.Redirect(w, r, fmt.Sprintf("hash?h=%s", blockSummaries[0].ID), 301)
 }
 
 // rootHandler handles the root page being requested. Is responsible for

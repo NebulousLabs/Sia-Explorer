@@ -3,11 +3,11 @@
     <table>
       <tr>
 	<td>Transaction ID</td>
-	<td>{{printf "%x" .Tx.ID}}</td>
+	<td>{{printf "%s" .Tx.ID}}</td>
       </tr>
       <tr>
 	<td>Block ID</td>
-	<td><a href='hash?h={{printf "%x" .ParentID}}'>{{printf "%x" .ParentID}}</a></td>
+	<td><a href='hash?h={{printf "%s" .ParentID}}'>{{printf "%s" .ParentID}}</a></td>
       </tr>
       <tr>
 	<td>Siacoin Inputs</td>
@@ -21,7 +21,7 @@
 	    {{range .Tx.SiacoinInputs}}
 	    {{$output := findOutput .ParentID}}
 	    <tr>
-	      <td><a href='hash?h={{printf "%x" .ParentID}}'>{{printf "%x" .ParentID}}</a></td>
+	      <td><a href='hash?h={{printf "%s" .ParentID}}'>{{printf "%s" .ParentID}}</a></td>
 	      <td>{{siacoinString $output.Value}}</td>
 	      <td><a href='hash?h={{$output.UnlockHash.String}}'>{{$output.UnlockHash.String}}</a></td>
 	    {{end}}
@@ -40,8 +40,8 @@
 	    {{range $index, $element := .Tx.SiacoinOutputs}}
 	    <tr>
 	      <td>
-		<a href='hash?h={{$index | $root.Tx.SiacoinOutputID | printf "%x"}}'>
-		  {{$index | $root.Tx.SiacoinOutputID | printf "%x"}}
+		<a href='hash?h={{$index | $root.Tx.SiacoinOutputID | printf "%s"}}'>
+		  {{$index | $root.Tx.SiacoinOutputID | printf "%s"}}
 		</a>
 	      </td>
 	      <td>{{siacoinString $element.Value}}</td>
@@ -54,8 +54,8 @@
     </table>
     <h4>File Contracts</h4>
     {{range $index, $element := .Tx.FileContracts}}
-    <h5><a href='hash?h={{$index | $root.Tx.FileContractID | printf "%x"}}'>
-	{{$index | $root.Tx.FileContractID | printf "%x"}}
+    <h5><a href='hash?h={{$index | $root.Tx.FileContractID | printf "%s"}}'>
+	{{$index | $root.Tx.FileContractID | printf "%s"}}
     </a></h5>
     <table>
       <tr>
@@ -79,8 +79,8 @@
 	    {{$fcid := $root.Tx.FileContractID $FCindex}}
 	    <tr>
 	      <td>
-		<a href='hash?h={{$FCindex | uint64 | $fcid.StorageProofOutputID true | printf "%x"}}'>
-		  {{$FCindex | uint64 | $fcid.StorageProofOutputID true | printf "%x"}}
+		<a href='hash?h={{$FCindex | uint64 | $fcid.StorageProofOutputID true | printf "%s"}}'>
+		  {{$FCindex | uint64 | $fcid.StorageProofOutputID true | printf "%s"}}
 		</a>
 	      </td>
 	      <td>{{siacoinString $FCelement.Value}}</td>
