@@ -5,31 +5,27 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strconv"
 
 	"github.com/NebulousLabs/Sia/modules"
 	"github.com/NebulousLabs/Sia/types"
+	"github.com/NebulousLabs/Sia/api"
 )
 
-// Does an arbitrary request to the server referenced by link, returns as a byte array.
-func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
-	// Do a HTTP request to the Sia daemon
-	resp, err := http.Get(es.url + apiCall)
+// make a GET request to the siae daemon
+func (es *ExploreServer) apiGet(call string) ([]byte, error) {
+	resp, err := api.HttpGET(es.url + call)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	defer resp.Body.Close()
-	response, err = ioutil.ReadAll(resp.Body)
-
+	response, err := ioutil.ReadAll(resp.Body)
 	if resp.StatusCode != 200 {
 		err = errors.New("Sia Daemon Returned Non-200: " + string(response))
-		return
 	}
-
-	return
+	return response, err
 }
 
 // ExplorerState queries the locally running status.
