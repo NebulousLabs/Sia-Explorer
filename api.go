@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/NebulousLabs/Sia/api"
 	"github.com/NebulousLabs/Sia/modules"
 	"github.com/NebulousLabs/Sia/types"
-	"github.com/NebulousLabs/Sia/api"
 )
 
 // make a GET request to the siae daemon
