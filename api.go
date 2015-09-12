@@ -21,7 +21,7 @@ func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 	if err != nil {
 		return
 	}
-	req.Header.Set("User-Agent", "Sia-Explorer")
+	req.Header.Set("User-Agent", "Sia-Agent")
 
 	// Do a HTTP request to the Sia daemon
 	resp, err := client.Do(req)
