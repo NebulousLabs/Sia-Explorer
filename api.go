@@ -15,14 +15,25 @@ import (
 
 // Does an arbitrary request to the server referenced by link, returns as a byte array.
 func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
+	client := &http.Client{}
+
+	req, err := http.NewRequest("GET", es.url+apiCall, nil)
+	if err != nil {
+		return
+	}
+	req.Header.Set("User-Agent", "Sia-Agent")
+
 	// Do a HTTP request to the Sia daemon
-	resp, err := http.Get(es.url + apiCall)
+	resp, err := client.Do(req)
 	if err != nil {
 		return
 	}
 
 	defer resp.Body.Close()
 	response, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
 
 	if resp.StatusCode != 200 {
 		err = errors.New("Sia Daemon Returned Non-200: " + string(response))
