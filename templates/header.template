@@ -3,4 +3,5 @@
     <title>Sia Explorer Alpha - {{.}}</title>
   </head>
   <body>
+    <a href=/>Home</a>
     <h1>{{.}}</h1>
