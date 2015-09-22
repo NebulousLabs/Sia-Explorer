@@ -61,11 +61,7 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
-	// Don't attempt to parse zero hashes
-	if hash == (crypto.Hash{}) {
-		return nil, nil
-	}
+func (es *ExploreServer) parseTransaction(hash types.TransactionID) ([]byte, error) {
 	// Decode into a responseData struct to figure out what type of response
 	// it is, then switch on it
 	itemJSON, err := es.apiGetHash(hash[:])
