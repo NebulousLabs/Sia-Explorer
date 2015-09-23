@@ -61,11 +61,7 @@ func (es *ExploreServer) hashPageHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
-	// Don't attempt to parse zero hashes
-	if hash == (crypto.Hash{}) {
-		return nil, nil
-	}
+func (es *ExploreServer) parseTransaction(hash types.TransactionID) ([]byte, error) {
 	// Decode into a responseData struct to figure out what type of response
 	// it is, then switch on it
 	itemJSON, err := es.apiGetHash(hash[:])
@@ -111,22 +107,6 @@ func (es *ExploreServer) parseTransaction(hash crypto.Hash) ([]byte, error) {
 		return es.parseTemplate("transaction.template", t)
 	}
 	return nil, nil
-}
-
-// parseTransactions iterates over a list of transactions and puts each one
-// into an HTML template, returning the concatenated list
-func (es *ExploreServer) parseTransactions(hashes []crypto.Hash) ([]byte, error) {
-	var page []byte
-
-	// Request all the other things to be viewed
-	for _, hash := range hashes {
-		parsed, err := es.parseTransaction(hash)
-		if err != nil {
-			return nil, err
-		}
-		page = append(page, parsed...)
-	}
-	return page, nil
 }
 
 // blockPage formats information about a block for viewing
@@ -250,7 +230,7 @@ func (es *ExploreServer) contractPage(w http.ResponseWriter, fcJSON []byte, fcid
 	w.Write(page)
 }
 
-// findOutput scans a transaction/bolck and returns the output
+// findOutput scans a transaction and returns the output
 func (es *ExploreServer) findOutput(oID types.SiacoinOutputID) (sco types.SiacoinOutput, err error) {
 	// First do a lookup on the txid
 	itemJSON, err := es.apiGetHash(oID[:])
@@ -264,7 +244,7 @@ func (es *ExploreServer) findOutput(oID types.SiacoinOutputID) (sco types.Siacoi
 		return
 	}
 
-	// Will have to switch on the type, as it colud be a block
+	// Will have to switch on the type, as it could be a block
 	itemJSON, err = es.apiGetHash(or.OutputTx[:])
 	if err != nil {
 		return
@@ -308,7 +288,7 @@ func findOutputBlock(oID types.SiacoinOutputID, b types.Block) (types.SiacoinOut
 	return types.SiacoinOutput{}, errors.New("output not found in block")
 }
 
-// findOutputTransactions scans through all otuputs in a transaction
+// findOutputTransactions scans through all outputs in a transaction
 // to find the one with a given ID
 func findOutputTransaction(oID types.SiacoinOutputID, tx types.Transaction) (types.SiacoinOutput, error) {
 	for i, output := range tx.SiacoinOutputs {
