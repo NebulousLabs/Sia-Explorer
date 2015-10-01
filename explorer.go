@@ -4,18 +4,20 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	//	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/NebulousLabs/Sia/types"
+	"github.com/gorilla/mux"
 )
 
 // A structure to store any state of the server. Should remain relatively
 // unpopulated, mostly constants which will eventually be broken off
 type ExploreServer struct {
-	url      string
-	serveMux *http.ServeMux
+	url    string
+	router *mux.Router
+	//logger *log.logger
 }
 
 // writeJSON writes the object to the ResponseWriter. If the encoding fails,
@@ -87,16 +89,6 @@ func (es *ExploreServer) heightHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("hash?h=%s", blockSummaries[0].ID), 301)
 }
 
-// rootHandler handles the root page being requested. Is responsible for
-// differentiating between API calls and pages
-func (es *ExploreServer) rootHandler(w http.ResponseWriter, r *http.Request) {
-	if strings.Contains(r.URL.Path, ".") {
-		es.serveMux.ServeHTTP(w, r)
-	} else {
-		es.overviewPage(w, r)
-	}
-}
-
 func main() {
 	// Parse command line flags for port numbers
 	apiPort := flag.String("a", "9980", "API port")
@@ -105,16 +97,18 @@ func main() {
 
 	// Initialize the server
 	var es = &ExploreServer{
-		url:      "http://localhost:" + *apiPort,
-		serveMux: http.NewServeMux(),
+		url:    "http://localhost:" + *apiPort,
+		router: mux.NewRouter().StrictSlash(true),
 	}
 
-	es.serveMux.Handle("/", http.FileServer(http.Dir("./webroot/")))
-	http.HandleFunc("/", es.rootHandler)
-	http.HandleFunc("/hash", es.hashPageHandler)
-	http.HandleFunc("/height", es.heightHandler)
-	http.HandleFunc("/hosts", es.hostsHandler)
-	err := http.ListenAndServe(":"+*hostPort, nil)
+	// Initialize the router that handles the API
+	es.NewAPIRouter()
+
+	es.router.PathPrefix("/").Handler(http.FileServer(http.Dir("./client/src/")))
+	//http.HandleFunc("/hash", es.hashPageHandler)
+	//http.HandleFunc("/height", es.heightHandler)
+	//http.HandleFunc("/hosts", es.hostsHandler)
+	err := http.ListenAndServe(":"+*hostPort, es.router)
 	if err != nil {
 		fmt.Println("Error when serving:", err)
 		os.Exit(1)
