@@ -9,7 +9,7 @@
     </head>
     <body ng-app="siaExplorerApp">
         <div class="contain-to-grid">
-            <div ng-include="'views/navbar.html'"></div>
+            <div ng-include="'components/navbar/navbar.html'"></div>
         </div>
 
         <div ng-view></div>
@@ -24,12 +24,9 @@
         <script src="services/explorerApi.service.js"></script>
         <script src="services/conversion.service.js"></script>
 
-        <script src="directives/host_table.directive.js"></script>
-        <script src="directives/host_row.directive.js"></script>
-
-        <script src="controllers/block.controller.js"></script>
-        <script src="controllers/hosts.controller.js"></script>
-        <script src="controllers/main.controller.js"></script>
-        <script src="controllers/navbar.controller.js"></script>
+        <script src="block/block.controller.js"></script>
+        <script src="hosts/hosts.controller.js"></script>
+        <script src="main/main.controller.js"></script>
+        <script src="components/navbar/navbar.controller.js"></script>
     </body>
 </html>

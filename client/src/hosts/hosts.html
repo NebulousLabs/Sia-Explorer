@@ -1,0 +1,37 @@
+<div class="row">
+<div class="small-12 text-center">
+    <br>
+    <b>Hosts</b>
+</div>
+</div>
+<div class="row">
+    <div class="large-8 medium-10 large-offset-2 medium-offset-1">
+        <table>
+            <thead>
+                <td width="50"><a ng-click="sortBy('IPAddress')">Address</a></td>
+                <td width="300"><a ng-click="sortBy('TotalStorage')">Total Storage</a></td>
+                <td width="200"><a ng-click="sortBy('MaxDuration')">Max Duration</a></td>
+                <td width="200"><a ng-click="sortBy('Price')">Price</a></td>
+            </thead>
+            <tbody>
+                <tr ng-repeat="host in hosts | orderBy:sortOrder" >
+                    <td>
+                        {{ host.IPAddress }}
+                    </td>
+                    <td>
+                        {{ getTotalStorage(host) }}
+                    </td>
+                    <td>
+                        {{ host.MaxDuration }}
+                    </td>
+                    <td>
+                        {{ getSiaPerGBPerMonth(host) }}
+                    </td>
+                </tr>
+                <tr ng-hide="hosts.length">
+                    <td class="text-center" colspan="4">No Hosts currently active on the network.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

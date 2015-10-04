@@ -6,15 +6,15 @@ app.config(['$routeProvider', function($routeProvider) {
         $routeProvider
         .when('/', {
             controller: "MainCtrl",
-            templateUrl: 'views/main.html',
+            templateUrl: 'main/main.html',
         })
         .when('/hosts/', {
             controller: "HostsCtrl",
-            templateUrl: 'views/hosts.html',
+            templateUrl: 'hosts/hosts.html',
         })
         .when('/block/:blockHash', {
             controller: "BlockCtrl",
-            templateUrl: 'views/block.html',
+            templateUrl: 'block/block.html',
         })
         .otherwise({redirectTo: '/'});
     }]);
