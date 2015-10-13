@@ -95,6 +95,7 @@ func (es *ExploreServer) getStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(status)
 }
@@ -118,6 +119,7 @@ func (es *ExploreServer) getHashByHeight(w http.ResponseWriter, r *http.Request)
 	//var blockSummaries []modules.ExplorerBlockData
 	//err = json.Unmarshal(blockSumJson, &blockSummaries)
 
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(blockSumJson)
 	//writeJson(w, blockSumJson)
 }
@@ -134,6 +136,7 @@ func (es *ExploreServer) getHosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(hostsJSON)
 }
@@ -152,6 +155,7 @@ func (es *ExploreServer) getBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(blockJson)
 }

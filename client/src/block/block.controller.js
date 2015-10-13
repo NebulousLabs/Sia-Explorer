@@ -11,5 +11,7 @@ app.controller('BlockCtrl', ['$scope',
             ExplorerService.getBlockHash($scope.hash)
                 .success(function(data){
                     $scope.block = data.Block;
+                    $scope.height = data.Height;
+                    $scope.block.date = new Date($scope.block.timestamp*1000);
                 });
         }]);

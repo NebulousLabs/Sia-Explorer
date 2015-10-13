@@ -15,5 +15,22 @@ app.factory('ConversionService', function(){
         return (bytes / Math.pow(10, 12)).toFixed(2);
     }
 
+    conversionSrvc.blocksToDays = function(blocks) {
+        // Blocks take ~10 mins to mine
+        return (blocks * 10) / (60 * 24);
+    }
+
+    conversionSrvc.getTotalStorage = function(host){
+        if (host.TotalStorage > Math.pow(10, 12)) {
+            return (host.TotalStorage / Math.pow(10, 12)) + ' TB';
+        } else {
+            return (host.TotalStorage / Math.pow(10, 9)) + ' GB';
+        }
+    }
+
+    conversionSrvc.getSiaPerGBPerMonth = function(host){
+        return ((host.Price) / (4.32 * Math.pow(10, 12))).toFixed(3);
+    }
+
     return conversionSrvc;
 });

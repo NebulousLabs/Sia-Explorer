@@ -11,7 +11,7 @@
                 <td width="50"><a ng-click="sortBy('IPAddress')">Address</a></td>
                 <td width="300"><a ng-click="sortBy('TotalStorage')">Total Storage</a></td>
                 <td width="200"><a ng-click="sortBy('MaxDuration')">Max Duration</a></td>
-                <td width="200"><a ng-click="sortBy('Price')">Price</a></td>
+                <td width="200"><a ng-click="sortBy('Price')">Price (SC/GB/Month)</a></td>
             </thead>
             <tbody>
                 <tr ng-repeat="host in hosts | orderBy:sortOrder" >
@@ -19,13 +19,13 @@
                         {{ host.IPAddress }}
                     </td>
                     <td>
-                        {{ getTotalStorage(host) }}
+                        {{ ConvSrvc.getTotalStorage(host) }}
                     </td>
                     <td>
-                        {{ host.MaxDuration }}
+                        {{ ConvSrvc.blocksToDays(host.MaxDuration) }} days
                     </td>
                     <td>
-                        {{ getSiaPerGBPerMonth(host) }}
+                        {{ ConvSrvc.getSiaPerGBPerMonth(host) }}
                     </td>
                 </tr>
                 <tr ng-hide="hosts.length">
