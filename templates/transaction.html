@@ -1,3 +1,0 @@
-{{printf "Transaction %s" .Tx.ID |  parseTemplate "header.template" | printf "%s"}}
-{{parseTemplate "transaction.template" . | printf "%s"}}
-{{printf "Transaction %s" .Tx.ID |  parseTemplate "footer.template" | printf "%s"}}
