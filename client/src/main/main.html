@@ -1,8 +1,8 @@
 <div class="row">
-    <div class="medium-4 medium-offset-4 columns text-center">
-        <br>
-        <b>Welcome to the Sia Explorer</b>
-    </div>
+<div class="medium-4 medium-offset-4 columns text-center">
+    <br>
+    <b>Welcome to the Sia Explorer</b>
+</div>
 </div>
 <div class="row">
     <div class="medium-8 medium-offset-2 text-center columns">
@@ -46,3 +46,16 @@
         </table>
     </div>
 </div>
+<div class="row">
+    <div class="medium-8 medium-offset-2 columns end">
+        <div class="row collapse">
+            <div class="small-9 columns">
+                <input type="text" name="hash" ng-model="blockHash">
+            </div>
+            <div class="small-3 columns">
+                <input type="submit" class="button postfix" value="Get By Hash" ng-click="getBlockByHash()">
+            </div>
+        </div>
+    </div>
+</div>
+
