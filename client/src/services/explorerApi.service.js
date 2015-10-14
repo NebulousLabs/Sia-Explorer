@@ -17,5 +17,9 @@ app.factory('ExplorerService', ['$http', function($http){
         return $http.get(baseurl + '/block/hash/' + hash)
     };
 
+    explorerService.getBlockHeight = function(height){
+        return $http.get(baseurl + '/block/height/' + height)
+    };
+
     return explorerService;
 }]);

@@ -6,9 +6,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 
+	"github.com/NebulousLabs/Sia/modules"
+	"github.com/NebulousLabs/Sia/types"
 	"github.com/gorilla/mux"
 )
 
@@ -53,4 +57,22 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("Done serving")
+}
+
+func (es *ExploreServer) getBlockRange(start types.BlockHeight, finish types.BlockHeight) ([]modules.ExplorerBlockData, error) {
+	v := url.Values{}
+	v.Set("start", strconv.Itoa(int(start)))
+	v.Add("finish", strconv.Itoa(int(finish)))
+	blockSumJson, err := es.apiGet("/explorer/blockdata?" + v.Encode())
+
+	if err != nil {
+		return nil, err
+	}
+
+	var blockSummaries []modules.ExplorerBlockData
+	err = json.Unmarshal(blockSumJson, &blockSummaries)
+	if err != nil {
+		return nil, err
+	}
+	return blockSummaries, nil
 }

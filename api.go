@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
-	"strconv"
 
 	"github.com/NebulousLabs/Sia/modules"
 	"github.com/NebulousLabs/Sia/types"
@@ -20,7 +18,7 @@ func (es *ExploreServer) NewAPIRouter() {
 
 	r.HandleFunc("/block/hash/{hash}", es.getBlock).
 		Methods("GET")
-	r.HandleFunc("/block/hash/height/{height}", es.getHashByHeight).
+	r.HandleFunc("/block/height/{height}", es.getBlockByHeight).
 		Methods("GET")
 	r.HandleFunc("/hosts/", es.getHosts).
 		Methods("GET")
@@ -60,7 +58,6 @@ func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 		err = errors.New("Sia Daemon Returned Non-200: " + string(response))
 		return
 	}
-
 	return
 }
 
@@ -100,28 +97,29 @@ func (es *ExploreServer) getStatus(w http.ResponseWriter, r *http.Request) {
 	w.Write(status)
 }
 
-func (es *ExploreServer) getHashByHeight(w http.ResponseWriter, r *http.Request) {
+func (es *ExploreServer) getBlockByHeight(w http.ResponseWriter, r *http.Request) {
 	var height types.BlockHeight
 
 	vars := mux.Vars(r)
 	fmt.Sscanf(vars["height"], "%d", &height)
-	//_, err := fmt.Sscanf(vars["height"
-	v := url.Values{}
-	v.Set("start", strconv.Itoa(int(height)))
-	v.Add("finish", strconv.Itoa(int(height+1)))
-	blockSumJson, err := es.apiGet("/blockexplorer/blockdata?" + v.Encode())
-	fmt.Println(blockSumJson)
+
+	blockSummaries, err := es.getBlockRange(height, height+1)
 	if err != nil {
-		fmt.Println(err)
-		//http.Error(w, "Failed to get blockdata", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	//var blockSummaries []modules.ExplorerBlockData
-	//err = json.Unmarshal(blockSumJson, &blockSummaries)
+	blockJson, err := es.apiGet("/explorer/gethash?hash=" + blockSummaries[0].ID.String())
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(blockSumJson)
-	//writeJson(w, blockSumJson)
+	w.WriteHeader(http.StatusOK)
+	w.Write(blockJson)
 }
 
 func (es *ExploreServer) getHash(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +149,6 @@ func (es *ExploreServer) getBlock(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(err)
 		return
 	}
 

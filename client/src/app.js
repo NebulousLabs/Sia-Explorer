@@ -12,7 +12,7 @@ app.config(['$routeProvider', function($routeProvider) {
             controller: "HostsCtrl",
             templateUrl: 'hosts/hosts.html',
         })
-        .when('/block/:blockHash', {
+        .when('/block/:type/:block', {
             controller: "BlockCtrl",
             templateUrl: 'block/block.html',
         })
