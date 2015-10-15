@@ -20,11 +20,11 @@ app.factory('ConversionService', function(){
         return (blocks * 10) / (60 * 24);
     }
 
-    conversionSrvc.getTotalStorage = function(host){
-        if (host.TotalStorage > Math.pow(10, 12)) {
-            return (host.TotalStorage / Math.pow(10, 12)) + ' TB';
+    conversionSrvc.bytesToString = function(storage){
+        if (storage > Math.pow(10, 12)) {
+            return (storage / Math.pow(10, 12)) + ' TB';
         } else {
-            return (host.TotalStorage / Math.pow(10, 9)) + ' GB';
+            return (storage / Math.pow(10, 9)) + ' GB';
         }
     }
 

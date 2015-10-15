@@ -32,3 +32,23 @@
         </table>
     </div>
 </div>
+<div class="row">
+    <div class="large-8 medium-10 large-offset-2 medium-offset-1">
+        <b>Payouts</b>
+        <table>
+            <thead>
+                <tr>
+                    <td>Amount</td>
+                    <td>Address</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="payout in block.minerpayouts">
+                    <td>{{ ConvSrvc.hastingsToString(payout.value) }} SC</td>
+                    <td>{{ payout.unlockhash }}</td>
+                    <td ng-show="block.minerpayouts.length == 0">No Payouts</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

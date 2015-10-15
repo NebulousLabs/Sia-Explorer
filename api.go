@@ -65,6 +65,7 @@ func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 func (es *ExploreServer) apiExplorerState() (explorerStatus modules.ExplorerStatus, err error) {
 	stateJSON, err := es.apiGet("/explorer/status")
 	if err != nil {
+		es.logger.Print(err)
 		return
 	}
 
@@ -72,23 +73,12 @@ func (es *ExploreServer) apiExplorerState() (explorerStatus modules.ExplorerStat
 	return
 }
 
-// GetBlockData queries a range of blocks from the server, and returns that list
-func (es *ExploreServer) apiGetBlockData(start types.BlockHeight, end types.BlockHeight) ([]modules.ExplorerBlockData, error) {
-	return nil, nil
-}
-
-// apiGetHash queries siad and returns the raw data. The JSON data can
-// be decoded based on the ResponseType field
-func (es *ExploreServer) apiGetHash(hash []byte) ([]byte, error) {
-	return es.apiGet(fmt.Sprintf("/explorer/gethash?hash=%x", hash))
-}
-
 func (es *ExploreServer) getStatus(w http.ResponseWriter, r *http.Request) {
 	status, err := es.apiGet("/explorer/status")
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(err)
+		es.logger.Print(err)
 		return
 	}
 
@@ -106,6 +96,7 @@ func (es *ExploreServer) getBlockByHeight(w http.ResponseWriter, r *http.Request
 	blockSummaries, err := es.getBlockRange(height, height+1)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		es.logger.Print(err)
 		return
 	}
 
@@ -113,7 +104,7 @@ func (es *ExploreServer) getBlockByHeight(w http.ResponseWriter, r *http.Request
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(err)
+		es.logger.Print(err)
 		return
 	}
 
@@ -122,15 +113,12 @@ func (es *ExploreServer) getBlockByHeight(w http.ResponseWriter, r *http.Request
 	w.Write(blockJson)
 }
 
-func (es *ExploreServer) getHash(w http.ResponseWriter, r *http.Request) {
-}
-
 func (es *ExploreServer) getHosts(w http.ResponseWriter, r *http.Request) {
 	hostsJSON, err := es.apiGet("/hostdb/hosts/active")
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(err)
+		es.logger.Print(err)
 		return
 	}
 
@@ -144,11 +132,11 @@ func (es *ExploreServer) getBlock(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash = vars["hash"]
 
-	fmt.Println(hash)
 	blockJson, err := es.apiGet("/explorer/gethash?hash=" + hash)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		es.logger.Print(err)
 		return
 	}
 
