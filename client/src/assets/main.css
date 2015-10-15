@@ -1,0 +1,15 @@
+.button {
+  background-color: #00CBA0;
+}
+
+.button:hover {
+  background-color: #008E70;
+}
+
+.top-bar-section li.active:not(.has-form) a:not(.button){
+  background-color: #00CBA0;
+}
+
+.top-bar-section li.active:not(.has-form) a:not(.button):hover{
+  background-color: #008E70;
+}

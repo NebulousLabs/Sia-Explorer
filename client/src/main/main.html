@@ -6,6 +6,28 @@
     </p>
 </div>
 </div>
+<div class="row">
+    <div class="medium-6 columns text-center">
+            <div class="row collapse">
+            <div class="small-8 columns">
+                <input type="text" name="hash" ng-model="blockHash">
+            </div>
+            <div class="small-4 columns">
+                <input type="submit" class="button postfix" value="Block Hash" ng-click="getBlockByHash()">
+            </div>
+        </div>
+    </div>
+    <div class="medium-6 columns end text-center">
+        <div class="row collapse">
+            <div class="small-8 columns">
+                <input type="text" name="hash" ng-model="blockHeight">
+            </div>
+            <div class="small-4 columns">
+                <input type="submit" class="button postfix" value="Block Height" ng-click="getBlockByHeight()">
+            </div>
+        </div>
+    </div>
+</div>
 <div class='row'>
     <div class="medium-3 medium-offset-2 columns">
         <b>Block Height</b>: 
@@ -44,22 +66,6 @@
                 <td>{{ ConvSrvc.hastingsToString(status.TotalContractCosts) | number }} SC</td>
             </tr>
         </table>
-        <div class="row collapse">
-            <div class="small-8 columns">
-                <input type="text" name="hash" ng-model="blockHash">
-            </div>
-            <div class="small-4 columns">
-                <input type="submit" class="button postfix" value="Block Hash" ng-click="getBlockByHash()">
-            </div>
-        </div>
-        <div class="row collapse">
-            <div class="small-8 columns">
-                <input type="text" name="hash" ng-model="blockHeight">
-            </div>
-            <div class="small-4 columns">
-                <input type="submit" class="button postfix" value="Block Height" ng-click="getBlockByHeight()">
-            </div>
-        </div>
     </div>
 </div>
 <div class="row">
