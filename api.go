@@ -26,13 +26,16 @@ func (es *ExploreServer) NewAPIRouter() {
 		Methods("GET")
 }
 
-func writeJson(w http.ResponseWriter, obj interface{}) {
-	if json.NewEncoder(w).Encode(obj) != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-	}
+// writeJson is responsible for sending back headers, and the json response
+// as well as the http status code
+func writeJson(w http.ResponseWriter, json []byte, httpStatus int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(httpStatus)
+	w.Write(json)
 }
 
-// Does an arbitrary request to the server referenced by link, returns as a byte array.
+// apiGet does an arbitrary request to the server referenced by link, returns
+// as a byte array.
 func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 	client := &http.Client{}
 
@@ -61,18 +64,7 @@ func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 	return
 }
 
-// ExplorerState queries the locally running status.
-func (es *ExploreServer) apiExplorerState() (explorerStatus modules.ExplorerStatus, err error) {
-	stateJSON, err := es.apiGet("/explorer/status")
-	if err != nil {
-		es.logger.Print(err)
-		return
-	}
-
-	err = json.Unmarshal(stateJSON, &explorerStatus)
-	return
-}
-
+// getStatus returns the siae status output
 func (es *ExploreServer) getStatus(w http.ResponseWriter, r *http.Request) {
 	status, err := es.apiGet("/explorer/status")
 
@@ -81,12 +73,11 @@ func (es *ExploreServer) getStatus(w http.ResponseWriter, r *http.Request) {
 		es.logger.Print(err)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(status)
+	writeJson(w, status, http.StatusOK)
 }
 
+// getBlockByHeight takes an integer and returns the corresponding block at
+// that height
 func (es *ExploreServer) getBlockByHeight(w http.ResponseWriter, r *http.Request) {
 	var height types.BlockHeight
 
@@ -107,12 +98,10 @@ func (es *ExploreServer) getBlockByHeight(w http.ResponseWriter, r *http.Request
 		es.logger.Print(err)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(blockJson)
+	writeJson(w, blockJson, http.StatusOK)
 }
 
+// getHosts returns a list of hosts that on the network
 func (es *ExploreServer) getHosts(w http.ResponseWriter, r *http.Request) {
 	hostsJSON, err := es.apiGet("/hostdb/hosts/active")
 
@@ -122,11 +111,10 @@ func (es *ExploreServer) getHosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(hostsJSON)
+	writeJson(w, hostsJSON, http.StatusOK)
 }
 
+// getBlock queries siae and returns a block given the block hash
 func (es *ExploreServer) getBlock(w http.ResponseWriter, r *http.Request) {
 	var hash string
 	vars := mux.Vars(r)
@@ -140,7 +128,5 @@ func (es *ExploreServer) getBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(blockJson)
+	writeJson(w, blockJson, http.StatusOK)
 }

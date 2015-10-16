@@ -38,6 +38,7 @@ func main() {
 	hostPort := flag.String("p", "9983", "HTTP host port")
 	flag.Parse()
 
+	// open the logfile for logger to write too
 	logFile, err := os.OpenFile(filepath.Join("./", "explorer.log"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0660)
 
 	// Initialize the server
@@ -59,6 +60,8 @@ func main() {
 	fmt.Println("Done serving")
 }
 
+// getBlockRange accepts a start and end value and returns all the blocks in
+// that range
 func (es *ExploreServer) getBlockRange(start types.BlockHeight, finish types.BlockHeight) ([]modules.ExplorerBlockData, error) {
 	v := url.Values{}
 	v.Set("start", strconv.Itoa(int(start)))

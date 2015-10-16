@@ -1,5 +1,6 @@
 'use strict';
 
+// Navbar controller handles the topbar menu functionality
 app.controller('NavbarCtrl', function($scope, $location) {
     $scope.menu = [{
         'title': 'Home',

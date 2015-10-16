@@ -1,6 +1,6 @@
 {
   "name": "Sia-Explorer",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A blockchain explorer for Sia",
   "repository": "https://github.com/NebulousLabs/Sia-Explorer",
   "devDependencies": {
