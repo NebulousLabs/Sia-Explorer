@@ -24,9 +24,9 @@
         <b>Transactions</b>
         <table>
             <tbody>
-                <tr ng-repeat="transaction in block.transactions">
+                <tr ng-repeat="transaction in transactionIds">
                     <td>{{ transaction }}</td>
-                    <td ng-show="block.transactions.length == 0">No Transactions</td>
+                    <td ng-show="transactionsIds.length == 0">No Transactions</td>
                 </tr>
             </tbody>
         </table>

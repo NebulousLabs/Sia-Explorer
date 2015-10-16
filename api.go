@@ -7,13 +7,17 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/NebulousLabs/Sia/modules"
 	"github.com/NebulousLabs/Sia/types"
 	"github.com/gorilla/mux"
 )
 
-// NewAPIRouter handles any urls that begin with '/api/'
-func (es *ExploreServer) NewAPIRouter() {
+// Create a type to unmarshal the json into
+type blockWrapper struct {
+	Block types.Block
+}
+
+// initAPIRouter creates a router that handles any urls that begin with '/api/'
+func (es *ExploreServer) initAPIRouter() {
 	r := es.router.PathPrefix("/api").Subrouter()
 
 	r.HandleFunc("/block/hash/{hash}", es.getBlock).
@@ -64,16 +68,55 @@ func (es *ExploreServer) apiGet(apiCall string) (response []byte, err error) {
 	return
 }
 
-// getStatus returns the siae status output
-func (es *ExploreServer) getStatus(w http.ResponseWriter, r *http.Request) {
-	status, err := es.apiGet("/explorer/status")
+// getBlock queries siae and returns a block given the block hash
+func (es *ExploreServer) getBlock(w http.ResponseWriter, r *http.Request) {
+	var hash string
+	vars := mux.Vars(r)
+	hash = vars["hash"]
+
+	blockJson, err := es.apiGet("/explorer/gethash?hash=" + hash)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		writeJson(w, nil, http.StatusInternalServerError)
 		es.logger.Print(err)
 		return
 	}
-	writeJson(w, status, http.StatusOK)
+
+	var blockWrapped blockWrapper
+	var block types.Block
+	err = json.Unmarshal(blockJson, &blockWrapped)
+	if err != nil {
+		writeJson(w, nil, http.StatusInternalServerError)
+		es.logger.Print(err)
+		return
+	}
+	block = blockWrapped.Block
+
+	// Get transaction ids for each transaction on block
+	transactionIds, err := es.getBlockTransactions(block)
+	if err != nil {
+		writeJson(w, nil, http.StatusInternalServerError)
+		es.logger.Print(err)
+		return
+	}
+
+	// Create a data structure to hold the block with transaction ids
+	data := struct {
+		Block          types.Block
+		TransactionIds []types.TransactionID
+	}{
+		block,
+		transactionIds,
+	}
+
+	// Prepare new data for writing to client
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		writeJson(w, nil, http.StatusInternalServerError)
+		es.logger.Print(err)
+		return
+	}
+	writeJson(w, jsonData, http.StatusOK)
 }
 
 // getBlockByHeight takes an integer and returns the corresponding block at
@@ -92,13 +135,47 @@ func (es *ExploreServer) getBlockByHeight(w http.ResponseWriter, r *http.Request
 	}
 
 	blockJson, err := es.apiGet("/explorer/gethash?hash=" + blockSummaries[0].ID.String())
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		es.logger.Print(err)
 		return
 	}
-	writeJson(w, blockJson, http.StatusOK)
+
+	var blockWrapped blockWrapper
+	var block types.Block
+	err = json.Unmarshal(blockJson, &blockWrapped)
+	if err != nil {
+		writeJson(w, nil, http.StatusInternalServerError)
+		es.logger.Print(err)
+		return
+	}
+	block = blockWrapped.Block
+
+	// Get transaction ids for each transaction on block
+	transactionIds, err := es.getBlockTransactions(block)
+	if err != nil {
+		writeJson(w, nil, http.StatusInternalServerError)
+		es.logger.Print(err)
+		return
+	}
+
+	// Create a data structure to hold the block with transaction ids
+	data := struct {
+		Block          types.Block
+		TransactionIds []types.TransactionID
+	}{
+		block,
+		transactionIds,
+	}
+
+	// Prepare new data for writing to client
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		writeJson(w, nil, http.StatusInternalServerError)
+		es.logger.Print(err)
+		return
+	}
+	writeJson(w, jsonData, http.StatusOK)
 }
 
 // getHosts returns a list of hosts that on the network
@@ -114,19 +191,14 @@ func (es *ExploreServer) getHosts(w http.ResponseWriter, r *http.Request) {
 	writeJson(w, hostsJSON, http.StatusOK)
 }
 
-// getBlock queries siae and returns a block given the block hash
-func (es *ExploreServer) getBlock(w http.ResponseWriter, r *http.Request) {
-	var hash string
-	vars := mux.Vars(r)
-	hash = vars["hash"]
-
-	blockJson, err := es.apiGet("/explorer/gethash?hash=" + hash)
+// getStatus returns the siae status output
+func (es *ExploreServer) getStatus(w http.ResponseWriter, r *http.Request) {
+	status, err := es.apiGet("/explorer/status")
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		es.logger.Print(err)
 		return
 	}
-
-	writeJson(w, blockJson, http.StatusOK)
+	writeJson(w, status, http.StatusOK)
 }
