@@ -5,6 +5,7 @@ app.controller('BlockCtrl', ['$scope', '$routeParams', 'ConversionService', 'Exp
     // initalize variables needed on page once api has returned the data
     var setBlockData = function(data){
       $scope.block = data.Block;
+      $scope.transactionIds = data.TransactionIds;
       $scope.height = data.Height;
       $scope.block.date = new Date($scope.block.timestamp*1000);
     }

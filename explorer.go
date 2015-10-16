@@ -49,7 +49,7 @@ func main() {
 	}
 
 	// Initialize the router that handles the API
-	es.NewAPIRouter()
+	es.initAPIRouter()
 
 	es.router.PathPrefix("/").Handler(http.FileServer(http.Dir("./client/src/")))
 	err = http.ListenAndServe(":"+*hostPort, es.router)
@@ -78,4 +78,13 @@ func (es *ExploreServer) getBlockRange(start types.BlockHeight, finish types.Blo
 		return nil, err
 	}
 	return blockSummaries, nil
+}
+
+// getBlockTransactions takes a block and gets the transactions for each block
+func (es *ExploreServer) getBlockTransactions(block types.Block) ([]types.TransactionID, error) {
+	var hashes []types.TransactionID
+	for i := range block.Transactions {
+		hashes = append(hashes, block.Transactions[i].ID())
+	}
+	return hashes, nil
 }
