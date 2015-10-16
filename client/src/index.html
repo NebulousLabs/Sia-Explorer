@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Sia Explorer</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="libraries/foundation/css/foundation.css">
+        <link rel="stylesheet" href="/assets/main.css">
+    </head>
+    <body ng-app="siaExplorerApp">
+        <div class="contain-to-grid">
+            <div ng-include="'components/navbar/navbar.html'"></div>
+        </div>
+
+        <div ng-view></div>
+
+        <script src="libraries/jquery/dist/jquery.js"></script>
+        <script src="libraries/angular/angular.js"></script>
+        <script src="libraries/angular-route/angular-route.js"></script>
+        <script src="libraries/foundation/js/foundation.js"></script>
+
+        <script src="app.js"></script>
+
+        <script src="services/explorerApi.service.js"></script>
+        <script src="services/conversion.service.js"></script>
+
+        <script src="block/block.controller.js"></script>
+        <script src="hosts/hosts.controller.js"></script>
+        <script src="main/main.controller.js"></script>
+        <script src="components/navbar/navbar.controller.js"></script>
+    </body>
+</html>

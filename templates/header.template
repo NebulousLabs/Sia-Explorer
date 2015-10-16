@@ -1,6 +1,0 @@
-<html>{{$root := .}}
-  <head>
-    <title>Sia Explorer Alpha - {{.}}</title>
-  </head>
-  <body>
-    <h1>{{.}}</h1>

@@ -1,0 +1,54 @@
+<div class="row">
+    <div class="small-12 text-center">
+        <br>
+        <b>Block: {{ height }}</b>
+        <br>
+        <p>
+        Parent: <a ng-href="#/block/hash/{{ block.parentid }}">{{ block.parentid }}</a>
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="large-8 medium-10 large-offset-2 medium-offset-1">
+        <p>
+        <b>Block Id:</b> {{ hash }}
+        <br>
+        <b>Payout:</b> {{ ConvSrvc.hastingsToString(block.minerpayouts[0].value) | number }} SC
+        <br>
+        <b>Date:</b> {{ block.date | date:'MM/dd/yyyy' }}
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="large-8 medium-10 large-offset-2 medium-offset-1">
+        <b>Transactions</b>
+        <table>
+            <tbody>
+                <tr ng-repeat="transaction in block.transactions">
+                    <td>{{ transaction }}</td>
+                    <td ng-show="block.transactions.length == 0">No Transactions</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="large-8 medium-10 large-offset-2 medium-offset-1">
+        <b>Payouts</b>
+        <table>
+            <thead>
+                <tr>
+                    <td>Amount</td>
+                    <td>Address</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="payout in block.minerpayouts">
+                    <td>{{ ConvSrvc.hastingsToString(payout.value) }} SC</td>
+                    <td>{{ payout.unlockhash }}</td>
+                    <td ng-show="block.minerpayouts.length == 0">No Payouts</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

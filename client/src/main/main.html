@@ -1,0 +1,77 @@
+<div class="row">
+<div class="medium-4 medium-offset-4 columns text-center">
+    <br>
+    <p>
+    <b>Sia Block Explorer</b>
+    </p>
+</div>
+</div>
+<div class="row">
+    <div class="medium-6 columns text-center">
+            <div class="row collapse">
+            <div class="small-8 columns">
+                <input type="text" name="hash" ng-model="blockHash">
+            </div>
+            <div class="small-4 columns">
+                <input type="submit" class="button postfix" value="Block Hash" ng-click="getBlockByHash()">
+            </div>
+        </div>
+    </div>
+    <div class="medium-6 columns end text-center">
+        <div class="row collapse">
+            <div class="small-8 columns">
+                <input type="text" name="hash" ng-model="blockHeight">
+            </div>
+            <div class="small-4 columns">
+                <input type="submit" class="button postfix" value="Block Height" ng-click="getBlockByHeight()">
+            </div>
+        </div>
+    </div>
+</div>
+<div class='row'>
+    <div class="medium-3 medium-offset-2 columns">
+        <b>Block Height</b>: 
+        {{ status.Height }} blocks
+        <br>
+        <b>Total Currency</b>: 
+        {{ ConvSrvc.hastingsToString(status.TotalCurrency) | number }} SC
+        <p>
+        <a ng-href="/#/block/hash/{{ status.Block.parentid }}">Most Recent Block</a>
+        <br>
+        <b>Last Seen Mature Block:</b> {{ status.Block.date | date:'MM/dd/yyyy' }}
+        </p>
+    </div>
+    <div class="medium-5 columns end">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Active</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tr>
+                <td><b>Contract Count</b></td>
+                <td>{{ status.ActiveContractCount | number }}</td>
+                <td>{{ status.TotalContractCount | number }}</td>
+            </tr>
+            <tr>
+                <td><b>Contract Sizes</b></td>
+                <td>{{ ConvSrvc.bytesToGB(status.ActiveContractSize) | number }} GB</td>
+                <td>{{ ConvSrvc.bytesToGB(status.TotalContractSize) | number }} GB</td>
+            </tr>
+            <tr>
+                <td><b>Contract Costs</b></td>
+                <td>{{ ConvSrvc.hastingsToString(status.ActiveContractCosts) | number }} SC</td>
+                <td>{{ ConvSrvc.hastingsToString(status.TotalContractCosts) | number }} SC</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="medium-8 medium-offset-2 text-center columns">
+        <p>
+        Interested in learning more about Sia? Check out <a href="http://siacoin.com/">http://siacoin.com/</a>.
+        </p>
+    </div>
+</div>
