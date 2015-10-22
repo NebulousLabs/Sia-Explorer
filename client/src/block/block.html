@@ -25,7 +25,7 @@
         <table>
             <tbody>
                 <tr ng-repeat="transaction in transactionIds">
-                    <td>{{ transaction }}</td>
+                    <td><a ng-href="/#/transaction/{{ transaction }}">{{ transaction }}</a></td>
                     <td ng-show="transactionsIds.length == 0">No Transactions</td>
                 </tr>
             </tbody>

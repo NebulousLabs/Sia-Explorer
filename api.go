@@ -24,6 +24,8 @@ func (es *ExploreServer) initAPIRouter() {
 		Methods("GET")
 	r.HandleFunc("/block/height/{height}", es.getBlockByHeight).
 		Methods("GET")
+	r.HandleFunc("/transaction/{hash}", es.getTransaction).
+		Methods("GET")
 	r.HandleFunc("/hosts/", es.getHosts).
 		Methods("GET")
 	r.HandleFunc("/status/", es.getStatus).
@@ -201,4 +203,21 @@ func (es *ExploreServer) getStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJson(w, status, http.StatusOK)
+}
+
+// getTransaction returns the transaction given a hash
+func (es *ExploreServer) getTransaction(w http.ResponseWriter, r *http.Request) {
+	var hash string
+	vars := mux.Vars(r)
+	hash = vars["hash"]
+
+	transactionJson, err := es.apiGet("/explorer/gethash?hash=" + hash)
+
+	if err != nil {
+		writeJson(w, nil, http.StatusInternalServerError)
+		es.logger.Print(err)
+		return
+	}
+
+	writeJson(w, transactionJson, http.StatusOK)
 }

@@ -27,5 +27,10 @@ app.factory('ExplorerService', ['$http', function($http){
         return $http.get(baseurl + '/block/height/' + height)
     };
 
+    // get a single transaction's information
+    explorerService.getTransaction = function(height){
+        return $http.get(baseurl + '/transaction/' + height)
+    };
+
     return explorerService;
 }]);

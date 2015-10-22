@@ -16,6 +16,10 @@ app.config(['$routeProvider', function($routeProvider) {
             controller: "BlockCtrl",
             templateUrl: 'block/block.html',
         })
+        .when('/transaction/:hash', {
+            controller: "TransactionCtrl",
+            templateUrl: 'transaction/transaction.html',
+        })
         .otherwise({redirectTo: '/'});
     }]);
 
