@@ -1,0 +1,90 @@
+<div class="row">
+<div class="small-12 text-center">
+    <br>
+    <b>Transaction: {{ transactionHash }}</b>
+    <br>
+    <p>
+    Parent: <a ng-href="#/block/hash/{{ parentId }}">{{ parentId }}</a>
+    </p>
+</div>
+</div>
+<div class="row">
+    <div class="large-8 medium-10 large-offset-2 medium-offset-1">
+        <b>Siacoin Inputs</b>
+        <table>
+            <thead>
+                <tr>
+                    <td>Output ID</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="input in transaction.siacoininputs">
+                    <td>{{ input.parentid }}</td>
+                </tr>
+                <tr>
+                    <td ng-show="!transaction.siacoininputs">No Siacoin Inputs</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="large-8 medium-10 large-offset-2 medium-offset-1">
+        <b>Siacoin Outputs</b>
+        <table>
+            <thead>
+                <tr>
+                    <td>Output ID</td>
+                    <td>Amount</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="output in transaction.siacoinoutputs">
+                    <td>{{ output.unlockhash }}</td>
+                    <td>{{ ConvSrvc.hastingsToString(output.value) }} SC</td>
+                </tr>
+                <tr>
+                    <td ng-show="!transaction.siacoinoutputs">No Siacoin Outputs</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="large-8 medium-10 large-offset-2 medium-offset-1">
+        <b>File Contracts</b>
+        <div class="row" ng-repeat="contract in transaction.filecontracts">
+            <div class="medium-12">
+                <br>
+                <p>
+                File Size: {{ contract.filesize }} bytes
+                <br>
+                Payout: {{ contract.payout }}
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Output ID</td>
+                            <td>Amount</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="output in contract.validproofoutputs">
+                            <td>{{ output.unlockhash }}</td>
+                            <td>{{ output.value }}</td>
+                        </tr>
+                        <tr>
+                            <td ng-show="!contract.validproofoutputs">No Siacoin Outputs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row" ng-show="!transaction.filecontracts">
+            <div class="medium-12">
+                <br>
+                No File Contract Payouts
+            </div>
+        </div>
+    </div>
+</div>
