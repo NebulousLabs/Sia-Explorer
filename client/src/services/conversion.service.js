@@ -5,17 +5,19 @@ app.factory('ConversionService', function(){
 
     // Convert Siacoin to a reasonable string
     conversionSrvc.hastingsToString = function(hastings) {
-        return (hastings / Math.pow(10, 24)).toFixed(2);
-    }
+        if (hastings === undefined){
+            return;
+        }
+        var postFixes = ["H", "zS", "aS", "fS", "pS", "nS", "µS", "mS", "SC", "KS", "MS", "GS", "TS", "PS"];
 
-    // convert bytes to gb with 2 point precision
-    conversionSrvc.bytesToGB = function(bytes) {
-        return (bytes / Math.pow(10, 9)).toFixed(2);
-    }
+        var tempNumb = hastings;
+        var loc = 0;
+        while (tempNumb >= Math.pow(10, 3)){
+            tempNumb = tempNumb / Math.pow(10, 3);
+            loc += 1;
+        }
 
-    // convert bytes to tb with 2 point precision
-    conversionSrvc.bytesToTB = function(bytes) {
-        return (bytes / Math.pow(10, 12)).toFixed(2);
+        return tempNumb.toFixed(3) + ' ' + postFixes[loc];
     }
 
     // Estimate the number of days a contract last given blocks
@@ -26,11 +28,19 @@ app.factory('ConversionService', function(){
 
     // Convert bytes to a string for easy displaying
     conversionSrvc.bytesToString = function(storage){
-        if (storage > Math.pow(10, 12)) {
-            return (storage / Math.pow(10, 12)) + ' TB';
-        } else {
-            return (storage / Math.pow(10, 9)) + ' GB';
+        if (storage === undefined){
+            return;
         }
+        var postFixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+
+        var tempNumb = storage;
+        var loc = 0;
+        while (tempNumb >= Math.pow(10, 3)){
+            tempNumb = tempNumb / Math.pow(10, 3);
+            loc += 1;
+        }
+
+        return tempNumb.toFixed(3) + ' ' + postFixes[loc];
     }
 
     // estimate the price of hosting given a price

@@ -34,7 +34,7 @@
         {{ status.Height }} blocks
         <br>
         <b>Total Currency</b>: 
-        {{ ConvSrvc.hastingsToString(status.TotalCurrency) | number }} SC
+        {{ ConvSrvc.hastingsToString(status.TotalCurrency) }}
         <p>
         <a ng-href="/#/block/hash/{{ status.Block.parentid }}">Most Recent Block</a>
         <br>
@@ -57,13 +57,13 @@
             </tr>
             <tr>
                 <td><b>Contract Sizes</b></td>
-                <td>{{ ConvSrvc.bytesToGB(status.ActiveContractSize) | number }} GB</td>
-                <td>{{ ConvSrvc.bytesToGB(status.TotalContractSize) | number }} GB</td>
+                <td>{{ ConvSrvc.bytesToString(status.ActiveContractSize) }}</td>
+                <td>{{ ConvSrvc.bytesToString(status.TotalContractSize) }}</td>
             </tr>
             <tr>
                 <td><b>Contract Costs</b></td>
-                <td>{{ ConvSrvc.hastingsToString(status.ActiveContractCosts) | number }} SC</td>
-                <td>{{ ConvSrvc.hastingsToString(status.TotalContractCosts) | number }} SC</td>
+                <td>{{ ConvSrvc.hastingsToString(status.ActiveContractCosts) }}</td>
+                <td>{{ ConvSrvc.hastingsToString(status.TotalContractCosts) }}</td>
             </tr>
         </table>
     </div>

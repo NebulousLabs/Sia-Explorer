@@ -41,7 +41,7 @@
             <tbody>
                 <tr ng-repeat="output in transaction.siacoinoutputs">
                     <td>{{ output.unlockhash }}</td>
-                    <td>{{ ConvSrvc.hastingsToString(output.value) }} SC</td>
+                    <td>{{ ConvSrvc.hastingsToString(output.value) }}</td>
                 </tr>
                 <tr>
                     <td ng-show="!transaction.siacoinoutputs">No Siacoin Outputs</td>
@@ -57,7 +57,7 @@
             <div class="medium-12">
                 <br>
                 <p>
-                File Size: {{ contract.filesize }} bytes
+                File Size: {{ ConvSrvc.bytesToString(contract.filesize) }} bytes
                 <br>
                 Payout: {{ contract.payout }}
                 </p>
