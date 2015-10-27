@@ -13,7 +13,7 @@
         <p>
         <b>Block Id:</b> {{ hash }}
         <br>
-        <b>Payout:</b> {{ ConvSrvc.hastingsToString(block.minerpayouts[0].value) | number }} SC
+        <b>Payout:</b> {{ ConvSrvc.hastingsToString(block.minerpayouts[0].value) }}
         <br>
         <b>Date:</b> {{ block.date | date:'MM/dd/yyyy' }}
         </p>
