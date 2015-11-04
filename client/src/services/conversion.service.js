@@ -45,7 +45,7 @@ app.factory('ConversionService', function(){
 
     // estimate the price of hosting given a price
     conversionSrvc.getSiaPerGBPerMonth = function(host){
-        return ((host.Price) / (4.32 * Math.pow(10, 12))).toFixed(3);
+        return ((host.Price * 4.32) / (Math.pow(10, 12))).toFixed(3);
     }
 
     return conversionSrvc;
