@@ -29,6 +29,8 @@ contracts are poorly handled and often hidden entirely.
 	- http://explore.sia.tech/hash.html?hash=3beb0cf05d42deda546b3bfb520055bd23e4419df03724f094d7b806c6299fd1
 + The Hash Page - an unlock hash to a spent siacoin output
 	- http://explore.sia.tech/hash.html?hash=52843ef15ea87b4c4d17f5c69c91cfdd0b72e6bdf70f97fbce5b66fd8591ebbd368a1ca574f9
++ The Hash Page - an unlock hash to multiple spent siacoin outputs
+	- http://explore.sia.tech/hash.html?hash=5de5900d709384fedcf85cf8d2b81a6ed79a8684ac7dfd296261f305329663808abcb655df3a
 + The Hash Page - an unlock hash to an unspent siacoin output
 	- Changes
 + The Hash Page - an id to a spent siacoin output that comes from a siacon input
