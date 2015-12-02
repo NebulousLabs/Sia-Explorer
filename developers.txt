@@ -1,0 +1,55 @@
+The Sia block explorer is a javascript page that makes http requests to an
+explorer-enabled sia daemon and formats the results into human-friendly pages.
+
+When testing, please view all of these pages for correctness (some include corner cases):
+
+Currently, the explorer ignores all payouts that are found in file contracts
+and file contract revisions. For storage proofs, it will show what the payouts
+were for submitting a valid proof. There is currently no way to view the missed
+storage proofs and their corresponding outputs. In general, outputs from file
+contracts are poorly handled and often hidden entirely.
+
++ The General Stats Page
+	- explore.sia.tech
++ The Block Page
+	- http://explore.sia.tech/block.html?height=26466
++ The Hash Page - A transaction with siacoin inputs and outputs
+	- http://explore.sia.tech/hash.html?hash=14c6eda8c2741c96cf1d2c7937a9386d8f5c1a127bc0f368737817722b899d31
++ The Hash Page - a transaction with a file contract
+	- http://explore.sia.tech/hash.html?hash=157999b7d9577e306c7e8fe04d401b6e9677050694e6ecf36f3e7c228c197c24
++ The Hash Page - a transaction with a file contract revision
+	- http://explore.sia.tech/hash.html?hash=58b1de66a30a7cbe5a7b98948650bd43ce9b4158c97d9e8ab1da126ee367ed16
++ The Hash Page - a transaction with a storage proof
+	- http://explore.sia.tech/hash.html?hash=b5bce91cc9d69f9d7109f7fd02d7d573e9efdb4613d8c03a63ea99d8fc464331
++ The Hash Page - a transaction with a siafund output that has no input
+	- http://explore.sia.tech/hash.html?hash=cadf10ae44897dafdc6377ed63b98696e3835374ae20948c50367f953865f4a4
++ The Hash Page - a transaction with a siafund input
+	- ???
++ The Hash Page - a transaction with arbitrary data.
+	- http://explore.sia.tech/hash.html?hash=3beb0cf05d42deda546b3bfb520055bd23e4419df03724f094d7b806c6299fd1
++ The Hash Page - an unlock hash to a spent siacoin output
+	- http://explore.sia.tech/hash.html?hash=52843ef15ea87b4c4d17f5c69c91cfdd0b72e6bdf70f97fbce5b66fd8591ebbd368a1ca574f9
++ The Hash Page - an unlock hash to an unspent siacoin output
+	- Changes
++ The Hash Page - an id to a spent siacoin output that comes from a siacon input
+	- http://explore.sia.tech/hash.html?hash=2a972c980a4b8af1323e9983b6208e7385c30437394efa5f509a83c171a8ab87
++ The Hash Page - an id to an unspent siacoin output that comes from a siacoin input
+	- Changes
++ The Hash Page - an id to a spent siacoin output that comes from a miner payout
+	- http://explore.sia.tech/hash.html?hash=5e1e876b58ba436564082391de05c757e844f4c3285044fce9f64a0f9e68d805
++ The Hash Page - an id to an unspent siacoin output that comes from a miner payout
+	- Changes
++ The Hash Page - an id to a file contract that doesn't have a revision but does have a storage proof
+	- http://explore.sia.tech/hash.html?hash=76dc9979538c0c2f5f895e44f55d3a20cedfce847096227b5c805c414bc2eb2f
++ The Hash Page - an id to a file contract that doesn't have a revision or storage proof
+	- http://explore.sia.tech/hash.html?hash=e537fbc813207628b69ec3c0a346f6e876d38f58c629ef58d9e2b0437b58e984
++ The Hash Page - an id to a file contract that has a revision and no storage proof
+	- ???
++ The Hash Page - an id to a file contract that has a revision and a storage proof
+	- ???
++ The Hash Page - an id to a file contract that has multiple revisions
+	- ???
++ The Hash Page - an invalid hash
+	- http://explore.sia.tech/hash.html?hash=76dc9979538c0c2f5f895e44f55d3a20cedfce847096227b5c805c414bc2eb2a
++ The Block Page - an invalid height
+	- http://explore.sia.tech/block.html?height=11126466

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang='en'>
+
+<head>
+	<meta charset='utf-8'>
+	<meta name='description' content='An explorer for Sia'>
+
+	<title>Sia Explorer</title>
+
+	<link rel='stylesheet' href='css/pure-min.css'>
+	<link rel='stylesheet' href='css/grids-responsive-min.css'>
+	<link rel='stylesheet' href='css/main.css'>
+
+	<script src='js/main.js'></script>
+	<script src='js/index.js'></script>
+
+	<!-- google analytics -->
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	  ga('create', 'UA-58715089-6', 'auto');
+	  ga('send', 'pageview');
+	</script>
+</head>
+
+<body>
+<div class='content'>
+	<div class='pure-menu pure-menu-horizontal'>
+		<a href='http://explore.sia.tech' class='pure-menu-heading'><img src='assets/sia-droplet.png' height='40px'></a>
+		<ul class='pure-menu-list'>
+			<li class='pure-menu-item'><a href='https://sia.tech' class='pure-menu-link'>sia.tech</a></li>
+			<li class='pure-menu-item'><a href='https://forum.sia.tech' class='pure-menu-link'>forum</a></li>
+			<li class='pure-menu-item'><a href='https://blog.sia.tech' class='pure-menu-link'>blog</a></li>
+		</ul>
+	</div>
+
+	<div class='banner'>
+		<h1 class='banner-head'>Sia Explorer</h1>
+	</div>
+
+	<table class='pure-table pure-table-horizontal stats'>
+		<thead>
+			<tr>
+				<th colspan='2' class='stats-head'>General Statistics</th>
+			</tr>
+		</thead>
+
+		<tr>
+			<th class='stats-title'>Height</th>
+			<th class='stats-info' id='height'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Current Block</th>
+			<th class='stats-info' id='blockID'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Total Coins</th>
+			<th class='stats-info' id='totalCoins'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Difficulty</th>
+			<th class='stats-info' id='difficulty'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Estimated Hashrate</th>
+			<th class='stats-info' id='hashrate'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Maturity Timestamp</th>
+			<th class='stats-info' id='maturityTimestamp'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Active File Contracts</th>
+			<th class='stats-info' id='activeFileContracts'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Total File Contract Cost</th>
+			<th class='stats-info' id='totalFileContractCost'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Total File Contract Size</th>
+			<th class='stats-info' id='totalFileContractSize'></th>
+		</tr>
+
+		<tr>
+			<th class='stats-title'>Successful Storage Proofs</th>
+			<th class='stats-info' id='storageProofs'></th>
+		</tr>
+
+		<!--
+		<tr>
+			<th class='stats-title'>Storage Proof Success Rate</th>
+			<th class='stats-info' id='storageProofSuccess'></th>
+		</tr>
+		-->
+	</table>
+
+	<div class='search-form search'>
+		<form class='search-form-tr' method=get' action='block.html'>
+			<span class='search-form-td'>Search by Block Height:</span>
+			<span class='search-form-td'><input type='text' name='height' size='50'></span>
+			<span class='search-form-td'><input type='submit' value='Go'></span>
+		</form>
+		<form class='search-form-tr' method=get' action='hash.html'>
+			<span class='search-form-td'>Search by Hash:</span>
+			<span class='search-form-td'><input type='text' name='hash' size='50'></span>
+			<span class='search-form-td'><input type='submit' value='Go'></span>
+		</form>
+	</div>
+</div>
+
+
+</body>
+</html>
