@@ -525,7 +525,7 @@ function populateHashPage(hash, explorerHash) {
 // fills out the page with the response.
 function fetchHashInfo(hash) {
 	var request = new XMLHttpRequest();
-	var reqString = '/explorer/' + hash;
+	var reqString = '/explorer/hashes/' + hash;
 	request.open('GET', reqString, false);
 	request.send();
 	if (request.status != 200) {
