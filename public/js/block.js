@@ -72,7 +72,7 @@ function displayTransactions(explorerBlock) {
 // presented.
 function fillBlock(height) {
 	var request = new XMLHttpRequest();
-	var reqString = '/explorer/block?height=' + height;
+	var reqString = '/explorer/blocks/' + height;
 	request.open('GET', reqString, false);
 	request.send();
 	if (request.status != 200) {
