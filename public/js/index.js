@@ -11,7 +11,6 @@ function fillGeneralStats() {
 		document.getElementById('totalCoins').innerHTML = readableCoins(explorerStatus.totalcoins);
 		document.getElementById('activeFileContracts').innerHTML = addCommasToNumber(explorerStatus.activecontractcount);
 		document.getElementById('totalFileContractCost').innerHTML = readableCoins(explorerStatus.totalcontractcost);
-		document.getElementById('totalFileContractSize').innerHTML = readableBytes(explorerStatus.totalcontractsize);
 		document.getElementById('storageProofs').innerHTML = addCommasToNumber(explorerStatus.storageproofcount);
 		// document.getElementById('storageProofSuccess').innerHTML = (100 * explorerStatus.storageproofcount / (explorerStatus.filecontractcount - explorerStatus.activecontractcount)).toFixed(0) + '%';
  	};
